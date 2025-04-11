@@ -1,12 +1,12 @@
 <template>
-  <nav class="navbar">
+  <nav class="navbar" :class="{ 'navbar-hidden': !isNavbarVisible }">
     <!-- Logo e título -->
     <div class="navbar-left">
       <img class="logo" src="@/assets/DevMindIcon.png" alt="Logo do Evento" />
       <span class="title">DevMind</span>
     </div>
 
-    <!-- Links de navegação -->
+    <!-- Links desktop -->
     <div class="navbar-right">
       <ul class="nav-list">
         <li class="nav-item">
@@ -25,10 +25,10 @@
       <button class="event-btn">Participar do Evento</button>
     </div>
 
-    <!-- Menu hambúrguer -->
+    <!-- Botão hambúrguer -->
     <button class="menu-btn" @click="toggleSidebar">☰</button>
 
-    <!-- Sidebar -->
+    <!-- Sidebar mobile -->
     <div class="sidebar" :class="{ 'sidebar-active': isSidebarActive }">
       <button class="close-btn" @click="toggleSidebar">×</button>
       <ul class="sidebar-nav">
@@ -45,7 +45,7 @@
           <a href="#" class="sidebar-link">Outras Edições</a>
         </li>
         <li class="sidebar-item" @click="toggleSidebar">
-          <a href="#" class="sidebar-link">Participar do Evento</a>
+          <a href="#" class="participar-link">Participar do Evento</a>
         </li>
       </ul>
     </div>
@@ -55,67 +55,86 @@
   </nav>
 </template>
 
-<script setup>
-import { ref } from 'vue';
+<script setup lang="ts">
+import { ref, onMounted, onBeforeUnmount } from 'vue';
 
 const isSidebarActive = ref(false);
+const isNavbarVisible = ref(true);
+const previousScroll = ref(window.pageYOffset);
 
 const toggleSidebar = () => {
   isSidebarActive.value = !isSidebarActive.value;
 };
+
+const handleScroll = () => {
+  const currentScroll = window.pageYOffset;
+  if (currentScroll > previousScroll.value && currentScroll > 100) {
+    isNavbarVisible.value = false;
+  } else if (currentScroll < previousScroll.value) {
+    isNavbarVisible.value = true;
+  }
+  previousScroll.value = currentScroll;
+};
+
+onMounted(() => {
+  window.addEventListener('scroll', handleScroll);
+});
+onBeforeUnmount(() => {
+  window.removeEventListener('scroll', handleScroll);
+});
 </script>
 
 <style scoped lang="scss">
-/* Estilos gerais da navbar */
 .navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 1rem;
   border-bottom: 1px solid #ccc;
+  background-color: rgba(0, 0, 0, 0.8);
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  z-index: 1100;
+}
+
+.navbar-hidden {
+  transform: translateY(-100%);
+  opacity: 0;
 }
 
 .navbar-left {
   display: flex;
   align-items: center;
 }
-
 .logo {
   width: 60px;
-  height: auto;
   margin-right: 1rem;
 }
-
 .title {
   font-size: 2rem;
   font-weight: bold;
+  color: #fff;
 }
 
 .navbar-right {
   display: flex;
   align-items: center;
 }
-
 .nav-list {
   display: flex;
   gap: 2rem;
   list-style: none;
-  margin: 0;
-  padding: 0;
 }
-
-.nav-item {
-  cursor: pointer;
-  
-  .nav-link {
-    text-decoration: none;
-    font-weight: 500;
-    color: #fff;
-    transition: all 0.3s ease;
-    
-    &.router-link-exact-active {
-      border-bottom: 2px solid #fff;
-    }
+.nav-link {
+  text-decoration: none;
+  font-weight: 500;
+  color: #fff;
+  transition: 0.3s;
+  &.router-link-exact-active {
+    border-bottom: 2px solid #fff;
   }
 }
 
@@ -123,75 +142,84 @@ const toggleSidebar = () => {
   margin-left: 2rem;
   padding: 0.5rem 1rem;
   background: none;
-  border: 1px solid #333;
+  border: 1px solid #fff;
   font-weight: bold;
-  cursor: pointer;
-  
+  color: #fff;
+  transition: background 0.3s ease;
   &:hover {
-    background: #333;
-    color: #fff;
+    background: #fff;
+    color: #000;
   }
 }
 
-/* Sidebar */
+/* Menu hambúrguer */
+.menu-btn {
+  display: none;
+  border: none;
+  background: #ffffff00;
+  font-size: 2rem;
+  cursor: pointer;
+  color: #fff;
+}
+
+/* Sidebar mobile */
 .sidebar {
   position: fixed;
   top: 0;
-  right: -300px;
-  width: 300px;
+  right: 0;
+  width: 80%;
   height: 100%;
   background-color: #fff;
-  box-shadow: -2px 0 5px rgba(0,0,0,0.2);
-  transition: right 0.3s ease;
-  z-index: 1000;
+  transform: translateX(100%);
+  transition: transform 0.3s ease;
+  z-index: 1200;
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
 
   &.sidebar-active {
-    right: 0;
+    transform: translateX(0);
   }
 }
 
 .close-btn {
+  align-self: flex-end;
   background: none;
   border: none;
-  font-size: 2rem;
+  font-size: 4rem;
   cursor: pointer;
-  display: block;
-  margin: 1rem;
 }
 
 .sidebar-nav {
   list-style: none;
+  margin-top: 0rem;
   padding: 0;
-  margin-top: 2rem;
 }
 
 .sidebar-item {
-  margin-bottom: 1rem;
-  cursor: pointer;
-  
-  .sidebar-link {
-    text-decoration: none;
-    font-weight: 500;
-    color: #333;
-    display: block;
-    padding: 0.5rem 1rem;
-    
-    &.router-link-exact-active {
-      color: #4361ee;
-      font-weight: bold;
-    }
-  }
+  margin-bottom: 1.5rem;
 }
 
-/* Restante dos estilos permanece igual */
-.menu-btn {
-  display: none;
-  background: none;
-  border: none;
-  font-size: 2rem;
-  cursor: pointer;
+.sidebar-link {
+  text-decoration: none;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #333;
+  display: block;
 }
 
+.participar-link {
+  background-color: black;
+  color: #fff;
+  padding: 0.75rem 1rem;
+  text-align: center;
+  border-radius: 4px;
+  font-weight: bold;
+  display: block;
+  text-decoration: none;
+}
+
+/* Overlay */
 .overlay {
   display: none;
   position: fixed;
@@ -199,16 +227,18 @@ const toggleSidebar = () => {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0,0,0,0.5);
-  z-index: 999;
+  background: rgba(0, 0, 0, 0.8);
+  z-index: 1100;
 
   &.overlay-active {
     display: block;
   }
 }
 
+/* Responsividade */
 @media (max-width: 768px) {
-  .nav-list, .event-btn {
+  .nav-list,
+  .event-btn {
     display: none;
   }
   .menu-btn {
