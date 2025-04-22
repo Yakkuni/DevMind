@@ -1,16 +1,15 @@
 <template>
   <div>
-    <NavBarComponent />
     <div class="slideshow">
       <div class="slideshow__container">
         <h1>
           <span>O <b>&nbsp;maior&nbsp;</b> evento</span>
-          <span> de tecnologia do</span>
-          <span> Vale do Jaguaribe</span>
+          <span> de tecnologia de</span>
+          <span> Tabuleiro do Norte</span>
         </h1>
         <h6>
           <span>Venha se reinventar |&nbsp;</span>
-          <span>IA e Ética - O Futuro é Agora!</span>
+          <span> o seu futuro é agora!</span>
         </h6>
         <div class="button secondary">
           <button type="button">Participar do Evento</button>
@@ -19,14 +18,15 @@
     </div>
     <CarouselComponent />
     <AbaoutUs />
+    <SpeakersComponent />
   </div>
 </template>
 
 <script setup lang="ts">
 import AbaoutUs from '../components/AboutUs.vue';
 import CarouselComponent from '../components/CarouselComponent.vue';
-import Footer from '../components/Footer.vue';
-import NavBarComponent from '../components/NavBarComponent.vue';
+import SpeakersComponent from '../components/SpeakersComponent.vue';
+
 </script>
 
 <style scoped lang="scss">

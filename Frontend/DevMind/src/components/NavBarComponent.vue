@@ -16,7 +16,7 @@
           <router-link to="/programacao" class="nav-link">Programação</router-link>
         </li>
         <li class="nav-item">
-          <a href="#" class="nav-link">Patrocinadores</a>
+          <router-link to="/patrocinadores" class="nav-link">Patrocinadores</router-link>
         </li>
         <li class="nav-item">
           <a href="#" class="nav-link">Outras Edições</a>
