@@ -18,9 +18,6 @@
         <li class="nav-item">
           <router-link to="/patrocinadores" class="nav-link">Patrocinadores</router-link>
         </li>
-        <li class="nav-item">
-          <a href="#" class="nav-link">Outras Edições</a>
-        </li>
       </ul>
       <button class="event-btn">Participar do Evento</button>
     </div>

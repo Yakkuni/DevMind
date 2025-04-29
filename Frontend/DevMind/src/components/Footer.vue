@@ -14,7 +14,6 @@
             <li><router-link to="/">Início</router-link></li>
             <li><router-link to="/programacao">Programação</router-link></li>
             <li><a href="#">Patrocinadores</a></li>
-            <li><a href="#">Outras Edições</a></li>
           </ul>
         </div>
   
