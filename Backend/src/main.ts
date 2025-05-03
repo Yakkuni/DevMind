@@ -1,15 +1,13 @@
-import express from "express";
-import { PalestranteControl } from "./controllers/palestrante.controller";
-import { PalestranteDao } from "./dao/palestrante.dao";
+import 'reflect-metadata'
+import {Api} from './api/api'
+import { PalestranteApi } from './api/palestrante.api'
 
-const palestranteControl = new PalestranteControl(new PalestranteDao())
 
-const app = express();
-app.use(express.json());
+function main() {
+    const api = Api.build()
+    PalestranteApi.build(api)
 
-app.post('/palestrante', (req, res)=>{
-    palestranteControl.createPalestrante(req, res)
-})
+    api.start()
+}
 
-app.get('')
-
+main()

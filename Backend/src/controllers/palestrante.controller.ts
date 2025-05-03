@@ -2,7 +2,7 @@ import {Request, Response} from "express";
 import { Palestrante } from "../model/Palestrante";
 import { PalestranteDao } from "../dao/palestrante.dao";
 
-export class PalestranteControl{
+export class PalestranteController{
 
     public constructor(readonly palestranteDao: PalestranteDao){}
 
