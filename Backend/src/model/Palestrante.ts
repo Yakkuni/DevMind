@@ -32,4 +32,13 @@ export class Palestrante{
         return new Palestrante(props)
     }
 
+    public toJSON(){
+        return {
+            id: this.props.id,
+            nome: this.props.nome,
+            descricao: this.props.descricao,
+            foto: this.props.foto,
+            redes: this.props.redes
+        }
     }
+}

@@ -11,11 +11,11 @@ export class Api {
 
     public start() {
         this.app.listen(3000, () => {
-            console.log("Server running")
+            console.log("Server running on port 3000")
         })
     }
 
-    public addRota(rota: string, metodo: string, funcao: (request: Request, response:Response) => void): void {
+    public addRota(rota: string, metodo: string, funcao: (request: Request, response: Response) => void): void {
         if (metodo === "POST") {
             this.app.post(rota, funcao)
         } else if (metodo === "GET") {
@@ -26,6 +26,6 @@ export class Api {
             this.app.put(rota, funcao)
         } else if (metodo === "PATCH") {
             this.app.patch(rota, funcao)
-        } 
+        }
     }
 }
