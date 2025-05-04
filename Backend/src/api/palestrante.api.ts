@@ -24,5 +24,6 @@ export class PalestranteApi {
         this.api.addRota("/palestrante/:id", "DELETE", this.controller.remover.bind(this.controller));
         this.api.addRota("/palestrante/:id", "PUT", this.controller.atualizar.bind(this.controller));
         this.api.addRota("/palestrante/previews", "GET", this.controller.listarPreviews.bind(this.controller));
+        this.api.addRota("/palestrante/lote", "POST", this.controller.criarEmLote.bind(this.controller));
     }
 }

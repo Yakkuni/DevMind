@@ -54,5 +54,21 @@ export class PalestranteController {
             res.status(500).json({ message: "Erro ao buscar previews", error });
         }
     }
+
+    public async criarEmLote(req: Request, res: Response) {
+        try {
+            const dtos: CreatePalestranteDTO[] = req.body;
+            
+            if (!Array.isArray(dtos)) {
+                return res.status(400).json({ message: "Esperado um array de palestrantes" });
+            }
+    
+            await this.service.criarEmLote(dtos);
+            res.status(201).json({ message: "Palestrantes criados com sucesso" });
+        } catch (error) {
+            console.error("Erro ao criar palestrantes em lote:", error);
+            res.status(500).json({ message: "Erro ao criar palestrantes em lote", error: (error as Error).message });
+        }
+    }
     
 }

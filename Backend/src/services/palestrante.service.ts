@@ -64,6 +64,20 @@ export class PalestranteService {
             site: dto.site ?? null
         };
     }
+
+    public async criarEmLote(dtos: CreatePalestranteDTO[]): Promise<void> {
+        for (const dto of dtos) {
+            const palestrante = Palestrante.build(dto.nome, dto.descricao, dto.foto, {
+                instagram: dto.instagram || null,
+                linkedin: dto.linkedin || null,
+                youtube: dto.youtube || null,
+                site: dto.site || null,
+            });
+    
+            await this.dao.save(palestrante);
+        }
+    }
+    
     
     
     
