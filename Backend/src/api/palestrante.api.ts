@@ -1,24 +1,28 @@
+import { Api } from "./api";
 import { PalestranteController } from "../controllers/palestrante.controller";
 import { PalestranteDao } from "../dao/palestrante.dao";
-import { Api } from "./api";
+import { PalestranteService } from "../services/palestrante.service";
 
-export class PalestranteApi{
-    readonly palestranteController: PalestranteController;
+export class PalestranteApi {
+    readonly controller: PalestranteController;
 
-    private constructor(readonly api: Api){
-        this.palestranteController = new PalestranteController(new PalestranteDao());
+    private constructor(private readonly api: Api) {
+        const dao = new PalestranteDao();
+        const service = new PalestranteService(dao);
+        this.controller = new PalestranteController(service);
     }
 
-    public static build(api: Api){
-        const userApi = new PalestranteApi(api)
-        userApi.addRotas()
+    public static build(api: Api) {
+        const instance = new PalestranteApi(api);
+        instance.addRotas();
     }
 
-    public addRotas(){
-        this.api.addRota("/palestrante", "POST", this.palestranteController.createPalestrante.bind(this.palestranteController))
-        this.api.addRota("/palestrante", "GET", this.palestranteController.getAllPalestrantes.bind(this.palestranteController))
-        this.api.addRota("/palestrante/:id", "GET", this.palestranteController.getPalestranteById.bind(this.palestranteController))
-        this.api.addRota("/palestrante/:id", "DELETE", this.palestranteController.deletePalestrante.bind(this.palestranteController))
-        this.api.addRota("/palestrante/:id", "PUT", this.palestranteController.updatePalestrante.bind(this.palestranteController))
+    private addRotas() {
+        this.api.addRota("/palestrante", "POST", this.controller.criar.bind(this.controller));
+        this.api.addRota("/palestrante", "GET", this.controller.listarTodos.bind(this.controller));
+        this.api.addRota("/palestrante/:id", "GET", this.controller.buscarPorId.bind(this.controller));
+        this.api.addRota("/palestrante/:id", "DELETE", this.controller.remover.bind(this.controller));
+        this.api.addRota("/palestrante/:id", "PUT", this.controller.atualizar.bind(this.controller));
+        this.api.addRota("/palestrante/previews", "GET", this.controller.listarPreviews.bind(this.controller));
     }
 }

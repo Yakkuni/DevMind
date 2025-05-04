@@ -1,84 +1,58 @@
-import {Request, Response} from "express";
-import { Palestrante } from "../model/Palestrante";
-import { PalestranteDao } from "../dao/palestrante.dao";
+import { Request, Response } from "express";
+import { PalestranteService } from "../services/palestrante.service";
+import { CreatePalestranteDTO } from "../dto/palestrante.dto";
 
-export class PalestranteController{
+export class PalestranteController {
+    constructor(private readonly service: PalestranteService) {}
 
-    public constructor(readonly palestranteDao: PalestranteDao){}
-
-    public async createPalestrante(req:Request, res: Response) {
-        const { nome, descricao, foto, instagram, linkedin, youtube, site } = req.body
-        const palestrante:Palestrante = Palestrante.build(nome, descricao, foto, {instagram, linkedin, youtube, site})
-        try{
-            await this.palestranteDao.savePalestrante(palestrante)
-            res.status(201).json({message: "Palestrante cadastrado com sucesso.", palestrante: palestrante.toJSON()})
-        }catch(error){
-            console.log({message: "Erro ao gravar palestrante: ", error})
-            res.status(500).json({message: "Erro ao gravar palestrante."})
-        }
-    }
-
-    public async getAllPalestrantes(req:Request, res: Response){
+    public async criar(req: Request, res: Response) {
         try {
-            const palestrantes = await this.palestranteDao.getAllPalestrantes()
-            const json = palestrantes.map(p => p.toJSON())
-            res.json(json)
+            const dto: CreatePalestranteDTO = req.body;
+            const palestrante = await this.service.criar(dto);
+            res.status(201).json(palestrante.toJSON());
         } catch (error) {
-            res.status(500).json({message: "Erro ao buscar palestrantes."})
-        }
+            console.error("Erro ao criar palestrante:", error);
+            res.status(500).json({ message: "Erro ao criar palestrante", error: (error as Error).message });
+        }        
     }
 
-    public async getPalestranteById(req:Request, res: Response){
+    public async listarTodos(req: Request, res: Response) {
+        const palestrantes = await this.service.listarTodos();
+        res.json(palestrantes.map(p => p.toJSON()));
+    }
+
+    public async buscarPorId(req: Request, res: Response) {
+        const id = req.params.id;
+        const palestrante = await this.service.buscarPorId(id);
+        if (!palestrante) {
+            return res.status(404).json({ message: "Palestrante não encontrado" });
+        }
+        res.json(palestrante.toJSON());
+    }
+
+    public async remover(req: Request, res: Response) {
+        const id = req.params.id;
+        await this.service.remover(id);
+        res.status(204).end();
+    }
+
+    public async atualizar(req: Request, res: Response) {
+        const id = req.params.id;
+        const dto: CreatePalestranteDTO = req.body;
+        const palestrante = await this.service.atualizar(id, dto);
+        if (!palestrante) {
+            return res.status(404).json({ message: "Palestrante não encontrado" });
+        }
+        res.json(palestrante.toJSON());
+    }
+
+    public async listarPreviews(req: Request, res: Response) {
         try {
-            const id = req.params.id
-            const palestrante = await this.palestranteDao.getPalestranteById(id)
-
-            if (!palestrante) {
-                return res.status(404).json({message: "Palestrante não encontrado."})
-            }
-
-            res.json(palestrante.toJSON())
+            const previews = await this.service.listarPreviews();
+            res.json(previews);
         } catch (error) {
-            res.status(500).json({message: "Erro ao buscar palestrante por ID."})
+            res.status(500).json({ message: "Erro ao buscar previews", error });
         }
     }
-
-    public async deletePalestrante(req:Request, res: Response){
-        try {
-            const id = req.params.id
-            const deleted = await this.palestranteDao.deletePalestranteById(id)
-            if (!deleted) {
-                return res.status(404).json({message: "Palestrante não encontrado para deletar."})
-            }
-            res.json({message: "Palestrante deletado com sucesso."})
-        } catch (error) {
-            res.status(500).json({message: "Erro ao deletar palestrante."})
-        }
-    }
-
-    public async updatePalestrante(req:Request, res: Response){
-        try {
-            const id = req.params.id
-            const { nome, descricao, foto, instagram, linkedin, youtube, site } = req.body
-
-            const palestranteAtualizado = Palestrante.assemble({
-                id,
-                nome,
-                descricao,
-                foto,
-                redes: { instagram, linkedin, youtube, site }
-            })
-
-            const updated = await this.palestranteDao.updatePalestrante(palestranteAtualizado)
-
-            if (!updated) {
-                return res.status(404).json({message: "Palestrante não encontrado para atualizar."})
-            }
-
-            res.json({message: "Palestrante atualizado com sucesso.", palestrante: palestranteAtualizado.toJSON()})
-
-        } catch (error) {
-            res.status(500).json({message: "Erro ao atualizar palestrante."})
-        }
-    }
+    
 }

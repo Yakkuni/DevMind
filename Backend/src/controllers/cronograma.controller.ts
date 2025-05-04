@@ -1,48 +1,54 @@
-import { Request, Response } from "express"
-import { Cronograma } from "../model/Cronograma"
-import { CronogramaDao } from "../dao/cronograma.dao"
+import { Request, Response } from "express";
+import { CronogramaService } from "../services/cronograma.service";
 
 export class CronogramaController {
-    public constructor(readonly dao: CronogramaDao) {}
+    constructor(private readonly service: CronogramaService) {}
 
     public async create(req: Request, res: Response) {
         try {
-            const { nome, descricao, horario, local, tipo, conduzidoPor } = req.body
-            const cronograma = Cronograma.build(nome, descricao, new Date(horario), local, tipo, conduzidoPor)
-            await this.dao.save(cronograma)
-            res.status(201).json(cronograma.props)
+            const { nome, descricao, horario, local, tipo, conduzidoPor } = req.body;
+            const cronograma = await this.service.create({ nome, descricao, horario, local, tipo, conduzidoPor });
+            res.status(201).json(cronograma.props);
         } catch (error) {
-            res.status(500).json({ message: "Erro ao criar cronograma", error })
+            res.status(500).json({ message: "Erro ao criar cronograma", error });
         }
     }
 
     public async getAll(req: Request, res: Response) {
-        const result = await this.dao.getAll()
-        res.json(result)
+        const cronogramas = await this.service.getAll();
+        res.json(cronogramas.map(c => c.props));
     }
 
     public async getById(req: Request, res: Response) {
-        const cronograma = await this.dao.getById(req.params.id)
+        const cronograma = await this.service.getById(req.params.id);
         if (!cronograma) {
-            res.status(404).json({ message: "Cronograma não encontrado" })
-        } else {
-            res.json(cronograma)
+            return res.status(404).json({ message: "Cronograma não encontrado" });
         }
+        res.json(cronograma.props);
     }
 
     public async delete(req: Request, res: Response) {
-        await this.dao.delete(req.params.id)
-        res.json({ message: "Cronograma excluído com sucesso" })
+        await this.service.delete(req.params.id);
+        res.status(204).end();
     }
 
     public async update(req: Request, res: Response) {
         try {
-            await this.dao.update(req.params.id, req.body)
-            res.json({ message: "Cronograma atualizado com sucesso" })
+            await this.service.update(req.params.id, req.body);
+            res.json({ message: "Cronograma atualizado com sucesso" });
         } catch (error) {
-            res.status(500).json({ message: "Erro ao atualizar", error })
+            res.status(500).json({ message: "Erro ao atualizar", error });
         }
     }
 
-    
+    // Novo método para buscar cronogramas por dia
+    public async getByDia(req: Request, res: Response) {
+        const data = req.params.data;
+        try {
+            const cronogramas = await this.service.getByDia(data);
+            res.json(cronogramas.map(c => c.props));
+        } catch (error) {
+            res.status(500).json({ message: "Erro ao buscar cronogramas para o dia", error });
+        }
+    }
 }
