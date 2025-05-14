@@ -15,5 +15,14 @@ export default defineConfig({
         additionalData: `@import "@/scss/app.scss";`
       }
     }
-  }
+  },
+  server: {
+    proxy: {
+      '/palestrante': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+        rewrite: path => path.replace(/^\/palestrante/, '/palestrante'),
+      },
+    },
+  },
 })
