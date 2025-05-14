@@ -1,76 +1,60 @@
-import poolCon from "../utils/connection";
+import { PrismaClient } from "@prisma/client";
 import { Cronograma, cronogramaProps } from "../model/Cronograma";
 
+const prisma = new PrismaClient();
+
 export class CronogramaDao {
-    public async save(cronograma: Cronograma) {
-        const { id, nome, descricao, horario, local, tipo, conduzidoPor } = cronograma.props;
-        await poolCon.query(
-            `INSERT INTO cronograma (id, nome, descricao, horario, local, tipo, conduzidoPor) 
-             VALUES (?, ?, ?, ?, ?, ?, ?)`,
-            [id, nome, descricao, horario, local, tipo, conduzidoPor]
-        );
-    }
+  public async save(cronograma: Cronograma) {
+    const { id, nome, descricao, horario, local, tipo, conduzidoPor } = cronograma.props;
+    await prisma.cronograma.create({
+      data: { id, nome, descricao, horario, local, tipo, conduzidoPor },
+    });
+  }
 
-    public async getAll(): Promise<cronogramaProps[]> {
-        const [rows] = await poolCon.query('SELECT * FROM cronograma ORDER BY horario ASC');
-        return (rows as any[]).map(row => ({
-            id: row.id,
-            nome: row.nome,
-            descricao: row.descricao,
-            horario: new Date(row.horario),
-            local: row.local,
-            tipo: row.tipo,
-            conduzidoPor: row.conduzidoPor
-        }));
-    }
+  public async getAll(): Promise<cronogramaProps[]> {
+    const rows = await prisma.cronograma.findMany({ orderBy: { horario: "asc" } });
+    return rows.map(row => ({
+      ...row,
+      tipo: row.tipo as "Palestra" | "Minicurso" | "Outro",
+    }));
+  }
 
-    public async getById(id: string): Promise<cronogramaProps | null> {
-        const [rows] = await poolCon.query('SELECT * FROM cronograma WHERE id = ?', [id]);
-        const row = (rows as any[])[0];
-        if (!row) return null;
-        return {
-            id: row.id,
-            nome: row.nome,
-            descricao: row.descricao,
-            horario: new Date(row.horario),
-            local: row.local,
-            tipo: row.tipo,
-            conduzidoPor: row.conduzidoPor
-        };
-    }
+  public async getById(id: string): Promise<cronogramaProps | null> {
+    const row = await prisma.cronograma.findUnique({ where: { id } });
+    if (!row) return null;
+    return {
+      ...row,
+      tipo: row.tipo as "Palestra" | "Minicurso" | "Outro",
+    };
+  }
 
-    public async delete(id: string) {
-        await poolCon.query('DELETE FROM cronograma WHERE id = ?', [id]);
-    }
+  public async delete(id: string) {
+    await prisma.cronograma.delete({ where: { id } });
+  }
 
-    public async update(id: string, dados: Partial<cronogramaProps>) {
-        const campos = [];
-        const valores = [];
+  public async update(id: string, dados: Partial<cronogramaProps>) {
+    await prisma.cronograma.update({
+      where: { id },
+      data: dados,
+    });
+  }
 
-        for (const key in dados) {
-            campos.push(`${key} = ?`);
-            valores.push((dados as any)[key]);
-        }
+  public async getByDia(data: string): Promise<cronogramaProps[]> {
+    const inicio = new Date(data + "T00:00:00.000Z");
+    const fim = new Date(data + "T23:59:59.999Z");
 
-        const sql = `UPDATE cronograma SET ${campos.join(', ')} WHERE id = ?`;
-        await poolCon.query(sql, [...valores, id]);
-    }
-
-    // Novo método para buscar cronogramas por data (dia)
-    public async getByDia(data: string): Promise<cronogramaProps[]> {
-        const dataFormatada = new Date(data).toISOString().split('T')[0]; // Formata a data para 'YYYY-MM-DD'
-        const [rows] = await poolCon.query(
-            'SELECT * FROM cronograma WHERE DATE(horario) = ? ORDER BY horario ASC',
-            [dataFormatada]
-        );
-        return (rows as any[]).map(row => ({
-            id: row.id,
-            nome: row.nome,
-            descricao: row.descricao,
-            horario: new Date(row.horario),
-            local: row.local,
-            tipo: row.tipo,
-            conduzidoPor: row.conduzidoPor
-        }));
-    }
+    const rows = await prisma.cronograma.findMany({
+      where: {
+        horario: {
+          gte: inicio,
+          lte: fim,
+        },
+      },
+      orderBy: { horario: "asc" },
+    });
+    return rows.map(row => ({
+      ...row,
+      tipo: row.tipo as "Palestra" | "Minicurso" | "Outro",
+    }));
+  }
 }

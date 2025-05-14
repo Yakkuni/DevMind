@@ -25,4 +25,13 @@ export class AuthController {
       res.status(400).json({ message: (error as Error).message });
     }
   }
+
+  public async me(req: Request, res: Response) {
+  try {
+    const usuario = (req as any).usuario; // Foi inserido pelo middleware
+    res.json({ usuario });
+  } catch (error) {
+    res.status(401).json({ message: "Não autenticado" });
+  }
+}
 }

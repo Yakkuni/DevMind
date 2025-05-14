@@ -1,0 +1,45 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Palestrante {
+  id        String  @id @default(uuid())
+  nome      String
+  minibio   String
+  foto      String
+  instagram String?
+  linkedin  String?
+  youtube   String?
+  site      String?
+
+  @@map("palestrantes")
+
+  
+}
+
+model Cronograma {
+  id           String   @id
+  nome         String
+  descricao    String
+  horario      DateTime
+  local        String
+  tipo         String
+  conduzidoPor String
+
+  @@map("cronograma") // Mapeia para a tabela existente
+}
+
+model Usuario {
+  id     String @id
+  nome   String
+  email  String @unique
+  senha  String
+
+  @@map("usuarios") // Mapeia para a tabela existente
+}
+
