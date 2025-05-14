@@ -31,6 +31,19 @@ export class UsuarioDao {
     });
   }
 
+  public async findAll(): Promise<Usuario[]> {
+    const rows = await prisma.usuario.findMany();
+    return rows.map((row) =>
+      Usuario.assemble({
+        id: row.id,
+        nome: row.nome,
+        email: row.email,
+        cargo: row.cargo as 'admin' | 'comum',
+        senha: row.senha,
+      })
+    );
+
+  }
   public async findById(id: string): Promise<Usuario | null> {
     const row = await prisma.usuario.findUnique({ where: { id } });
     if (!row) return null;
@@ -43,4 +56,23 @@ export class UsuarioDao {
       senha: row.senha,
     });
   }
+
+  public async update(usuario: Usuario): Promise<void> {
+    const { id, nome, email, cargo } = usuario.toJSON();
+
+    await prisma.usuario.update({
+      where: { id },
+      data: {
+        nome,
+        email,
+        cargo,
+      },
+    });
+  }
+
+  public async delete(id: string): Promise<void> {
+    await prisma.usuario.delete({ where: { id } });
+  }
+
+
 }

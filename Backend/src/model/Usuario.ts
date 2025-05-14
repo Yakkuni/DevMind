@@ -46,4 +46,17 @@ export class Usuario {
   public getId() {
     return this.props.id;
   }
+
+  public setNome(nome: string) {
+    this.props.nome = nome;
+  }
+  public setEmail(email: string) {
+    this.props.email = email;
+  }
+  public setSenha(senha: string) {
+    this.props.senha = senha;
+  }
+  public setCargo(cargo: 'admin' | 'comum') {
+    this.props.cargo = cargo;
+  }
 }

@@ -37,4 +37,6 @@ export class AuthService {
     // Salva o usuário no banco de dados
     await this.dao.create(usuario);
   }
+
+  
 }

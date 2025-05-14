@@ -34,4 +34,6 @@ export class AuthController {
     res.status(401).json({ message: "Não autenticado" });
   }
 }
+
+  
 }
