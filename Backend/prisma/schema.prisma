@@ -31,7 +31,7 @@ model Cronograma {
   tipo         String
   conduzidoPor String
 
-  @@map("cronograma") // Mapeia para a tabela existente
+  @@map("cronograma")
 }
 
 model Usuario {
@@ -40,6 +40,6 @@ model Usuario {
   email  String @unique
   senha  String
 
-  @@map("usuarios") // Mapeia para a tabela existente
+  @@map("usuarios")
 }
 
