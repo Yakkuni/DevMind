@@ -19,7 +19,7 @@ export class AuthService {
     return gerarToken({ 
       id: usuario.getId(), 
       email: usuario.getEmail(), 
-      cargo: usuario.getCargo(), });
+      cargo: usuario.getCargo() });
   }
 
   // Função de registro (cadastro) de um novo usuário
