@@ -10,17 +10,16 @@ datasource db {
 model Palestrante {
   id        String  @id @default(uuid())
   nome      String
-  minibio   String
-  foto      String
-  instagram String?
+  minibio   String  @db.Text
+  foto      String  @db.Text
+  instagram String? 
   linkedin  String?
   youtube   String?
   site      String?
 
   @@map("palestrantes")
-
-  
 }
+
 
 model Cronograma {
   id           String   @id
