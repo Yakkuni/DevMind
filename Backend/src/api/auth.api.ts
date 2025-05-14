@@ -3,7 +3,7 @@ import { Api } from "./api";
 import { AuthController } from "../controllers/auth.controller";
 import { AuthService } from "../services/auth.service";
 import { UsuarioDao } from "../dao/usuario.dao";
-import { autenticarRequisicao } from "../utils/auth.middleware"; // Importando o middleware
+import { autenticarRequisicao, autenticarAdmin } from "../utils/auth.middleware"; // Importando o middleware
 
 export class AuthApi {
   private constructor(private readonly api: Api) {}
@@ -17,8 +17,7 @@ export class AuthApi {
     api.addRota("/login", "POST", [], controller.login.bind(controller));
 
     // Rota de registro precisa de autenticação, pois estamos criando usuários
-    api.addRota("/register", "POST", [], controller.register.bind(controller)); // Rota de registro; LEMBRAR DE ADICIONAR O "autenticarRequisicao" DEPOIS PELO AMOR DE DEUS
-
+    api.addRota("/register", "POST", [autenticarRequisicao, autenticarAdmin], controller.register.bind(controller)); // Rota de registro; LEMBRAR DE ADICIONAR O "autenticarRequisicao" e "autenticarAdmin" DEPOIS PELO AMOR DE DEUS
 
 
     // checar se o usuário está autenticado

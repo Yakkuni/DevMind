@@ -2,17 +2,19 @@ type usuarioProps = {
   id: string,
   nome: string,
   email: string,
-  senha: string; // hash da senha
+  cargo: 'admin' | 'comum',
+  senha: string;
 };
 
 export class Usuario {
   constructor(private readonly props: usuarioProps) {}
 
-  public static build(nome: string, email: string, senha: string) {
+  public static build(nome: string, email: string, cargo: 'admin' | 'comum', senha: string) {
     return new Usuario({
       id: crypto.randomUUID(),
       nome,
       email,
+      cargo,
       senha
     });
   }
@@ -32,6 +34,13 @@ export class Usuario {
 
   public getEmail() {
     return this.props.email;
+  }
+
+  public getNome() {
+    return this.props.nome;
+  }
+  public getCargo() {
+    return this.props.cargo;
   }
 
   public getId() {

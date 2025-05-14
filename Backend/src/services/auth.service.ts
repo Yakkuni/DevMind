@@ -1,11 +1,9 @@
-// services/auth.service.ts
-import bcrypt from "bcrypt";
 import { UsuarioDao } from "../dao/usuario.dao";
 import { LoginDTO } from "../dto/auth.dto";
 import { Usuario } from "../model/Usuario";
 import { gerarToken } from "../utils/token";
+import { Cryptography } from "../utils/cryptography";
 
-const SALT_ROUNDS = 10; // O número de "salts" para o bcrypt
 
 export class AuthService {
   constructor(private readonly dao: UsuarioDao) {}
@@ -15,23 +13,26 @@ export class AuthService {
     const usuario = await this.dao.findByEmail(dto.email);
     if (!usuario) throw new Error("Credenciais inválidas");
 
-    const senhaCorreta = await bcrypt.compare(dto.senha, usuario.getSenha());
+    const senhaCorreta = await Cryptography.compareHash(dto.senha, usuario.getSenha());
     if (!senhaCorreta) throw new Error("Credenciais inválidas");
 
-    return gerarToken({ id: usuario.getId(), email: usuario.getEmail() });
+    return gerarToken({ 
+      id: usuario.getId(), 
+      email: usuario.getEmail(), 
+      cargo: usuario.getCargo(), });
   }
 
   // Função de registro (cadastro) de um novo usuário
-  public async registrar(nome: string, email: string, senha: string): Promise<void> {
+  public async registrar(nome: string, email: string, cargo: 'admin' | 'comum', senha: string): Promise<void> {
     // Verifica se já existe um usuário com esse e-mail
     const usuarioExistente = await this.dao.findByEmail(email);
     if (usuarioExistente) throw new Error("E-mail já cadastrado");
 
     // Criptografa a senha
-    const senhaCriptografada = await bcrypt.hash(senha, SALT_ROUNDS);
+    const senhaCriptografada = await Cryptography.hash(senha);
 
     // Cria o novo usuário
-    const usuario = Usuario.build(nome, email, senhaCriptografada);
+    const usuario = Usuario.build(nome, email, cargo, senhaCriptografada);
 
     // Salva o usuário no banco de dados
     await this.dao.create(usuario);
