@@ -1,12 +1,16 @@
 import { CronogramaDao } from "../dao/cronograma.dao";
 import { CreateCronogramaDTO } from "../dto/cronograma.dto";
 import { Cronograma, cronogramaProps } from "../model/Cronograma";
+import { HistoricoService } from "./historico.service";
 
 export class CronogramaService {
-    constructor(private readonly dao: CronogramaDao) {}
+    constructor(
+        private readonly dao: CronogramaDao,
+        private readonly historico: HistoricoService
+    ) {}
 
-    public async create(dto: CreateCronogramaDTO): Promise<Cronograma> {
-        const cronograma = Cronograma.build(
+    public async create(dto: CreateCronogramaDTO, userId: string): Promise<Cronograma> {
+        try{const cronograma = Cronograma.build(
             dto.nome,
             dto.descricao,
             new Date(dto.horario),
@@ -14,8 +18,14 @@ export class CronogramaService {
             dto.tipo,
             dto.conduzidoPor
         );
+        
         await this.dao.save(cronograma);
+        this.historico.createHistorico("criou", "atividade", userId);
         return cronograma;
+    }catch(error){
+            console.error("Erro ao criar cronograma:", error);
+            throw error;
+        }
     }
 
     public async getAll(): Promise<Cronograma[]> {
@@ -29,17 +39,27 @@ export class CronogramaService {
         return Cronograma.assemble(cronograma);
     }
 
-    public async delete(id: string): Promise<void> {
+    public async delete(id: string, userId: string): Promise<void> {
         await this.dao.delete(id);
+        await this.historico.createHistorico(
+            "deletou",
+            "atividade",
+            userId
+        );
     }
 
-    public async update(id: string, dto: Partial<CreateCronogramaDTO>): Promise<void> {
+    public async update(id: string, dto: Partial<CreateCronogramaDTO>, userId: string): Promise<void> {
         const dadosAtualizados: Partial<cronogramaProps> = {
             ...dto,
             horario: dto.horario ? new Date(dto.horario) : undefined,
         }
     
         await this.dao.update(id, dadosAtualizados)
+        await this.historico.createHistorico(
+            "atualizou",
+            "atividade",
+            userId
+        );
     }
     
     

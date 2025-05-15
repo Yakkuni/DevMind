@@ -4,13 +4,17 @@ import { CronogramaController } from "../controllers/cronograma.controller";
 import { CronogramaDao } from "../dao/cronograma.dao";
 import { CronogramaService } from "../services/cronograma.service";
 import { autenticarRequisicao } from "../utils/auth.middleware"; // Importando o middleware
+import { HistoricoDao } from "../dao/historico.dao";
+import { HistoricoService } from "../services/historico.service";
 
 export class CronogramaApi {
     private constructor(private readonly api: Api, private readonly controller: CronogramaController) {}
 
     public static build(api: Api) {
+        const historicoDao = new HistoricoDao();
+        const historicoService = new HistoricoService(historicoDao);
         const dao = new CronogramaDao();
-        const service = new CronogramaService(dao);
+        const service = new CronogramaService(dao, historicoService);
         const controller = new CronogramaController(service);
         const instance = new CronogramaApi(api, controller);
         instance.addRoutes();

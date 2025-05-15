@@ -34,19 +34,32 @@ model Cronograma {
 }
 
 model Usuario {
-  id     String @id
-  nome   String
-  email  String @unique
-  cargo  String
-  senha  String
+  id        String      @id
+  nome      String
+  email     String      @unique
+  cargo     String
+  senha     String
+  historico Historico[]
 
   @@map("usuarios")
 }
+
 
 model Patrocinador {
   id         String        @id @default(uuid())
   nome       String
   logo       String        @db.Text
   redeSocial Json
+}
+
+model Historico {
+  id         String   @id @default(uuid())
+  acao       String
+  entidade   String
+  data       DateTime @default(now())
+  usuarioId  String
+  usuario    Usuario  @relation(fields: [usuarioId], references: [id])
+
+  @@map("historico")
 }
 

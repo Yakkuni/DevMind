@@ -6,8 +6,9 @@ export class CronogramaController {
 
     public async create(req: Request, res: Response) {
         try {
+            const usuarioId = ((req as any).usuario.id) as string;
             const { nome, descricao, horario, local, tipo, conduzidoPor } = req.body;
-            const cronograma = await this.service.create({ nome, descricao, horario, local, tipo, conduzidoPor });
+            const cronograma = await this.service.create({ nome, descricao, horario, local, tipo, conduzidoPor }, usuarioId);
             res.status(201).json(cronograma.props);
         } catch (error) {
             res.status(500).json({ message: "Erro ao criar cronograma", error });
@@ -28,13 +29,15 @@ export class CronogramaController {
     }
 
     public async delete(req: Request, res: Response) {
-        await this.service.delete(req.params.id);
+        const usuarioId = (req as any).usuario.id;
+        await this.service.delete(req.params.id, usuarioId);
         res.status(204).end();
     }
 
     public async update(req: Request, res: Response) {
         try {
-            await this.service.update(req.params.id, req.body);
+            const usuarioId = (req as any).usuario.id;
+            await this.service.update(req.params.id, req.body, usuarioId);
             res.json({ message: "Cronograma atualizado com sucesso" });
         } catch (error) {
             res.status(500).json({ message: "Erro ao atualizar", error });
