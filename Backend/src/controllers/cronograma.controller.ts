@@ -7,7 +7,6 @@ export class CronogramaController {
     public async create(req: Request, res: Response) {
         try {
             const usuarioId = ((req as any).usuario.id) as string;
-            console.log("ID do usuário:", usuarioId);
             const { nome, descricao, horario, local, tipo, conduzidoPor } = req.body;
             const cronograma = await this.service.create({ nome, descricao, horario, local, tipo, conduzidoPor }, usuarioId);
             res.status(201).json(cronograma.props);
