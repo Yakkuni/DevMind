@@ -1,5 +1,6 @@
 import express, { Express, Request, Response } from "express";
 import dotenv from "dotenv";
+import cors from 'cors'; // ✅ Importa o middleware CORS
 
 dotenv.config();
 
@@ -14,7 +15,15 @@ export class Api {
 
   public static build() {
     const app = express();
-    app.use(express.json());
+
+    // ✅ Adiciona o middleware CORS ANTES de tudo
+    app.use(cors({
+      origin: 'http://localhost:5173', // 👉 Permite requisições vindas do front-end (Vite)
+      credentials: true, // 👉 Permite envio de cookies e headers personalizados
+    }));
+
+    app.use(express.json()); // Middleware para ler JSON
+
     return new Api(app);
   }
 
