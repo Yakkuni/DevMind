@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Admin - Usuários</title>
+  <link rel="stylesheet" href="user-style.css" />
+</head>
+<body>
+
+  <!-- Navegação -->
+  <nav>
+    <div class="logo">Painel Admin</div>
+    <ul>
+      <li><a href="palestrante.html">Palestrante</a></li>
+      <li><a href="#">Cronograma</a></li>
+      <li><a href="#">Patrocinadores</a></li>
+      <li><a href="user.html">Usuários</a></li>
+    </ul>
+  </nav>
+
+  <!-- Conteúdo principal lado a lado -->
+  <div class="main">
+    <!-- Histórico de Ações -->
+    <div class="section">
+      <h2>Histórico de Ações</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Usuário</th>
+            <th>Ação</th>
+            <th>Data/Hora</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>João Silva</td>
+            <td>Adicionou um palestrante</td>
+            <td>14/05/2025 10:32</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Lista de Usuários -->
+    <!-- ... dentro da div .section da Lista de Usuários -->
+    <div class="section">
+      <h2>Lista de Usuários</h2>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th>Email</th>
+            <th>Papel</th>
+            <th>Status</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody id="user-list">
+          <!-- Conteúdo gerado via JS -->
+        </tbody>
+      </table>
+
+      <button class="add-btn" onclick="abrirFormulario()">+ Adicionar Novo Usuário</button>
+    </div>
+
+  </div>
+
+  <!-- Formulário Modal -->
+  <div id="form-modal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="fecharFormulario()">&times;</span>
+      <h3>Novo Usuário</h3>
+      <form id="user-form">
+        <label>Nome:</label>
+        <input type="text" id="nome" required />
+        <label>Email:</label>
+        <input type="email" id="email" required />
+        <label>Cargo:</label>
+        <select id="cargo">
+          <option value="Admin">Admin</option>
+          <option value="Comum">Comum</option>
+        </select>
+        <label>Senha:</label>
+        <input type="password" id="senha" required />
+        <button type="submit" class="submit-btn">Criar Usuário</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="UserScript.js"></script>
+</body>
+</html>
