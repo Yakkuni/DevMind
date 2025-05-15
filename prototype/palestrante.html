@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Admin - Palestrantes</title>
+  <link rel="stylesheet" href="palestrante-style.css" />
+</head>
+<body>
+
+  <nav>
+    <div class="logo">Painel Admin</div>
+    <ul>
+      <li><a href="palestrante.html">Palestrante</a></li>
+      <li><a href="#">Cronograma</a></li>
+      <li><a href="#">Patrocinadores</a></li>
+      <li><a href="user.html">Usuários</a></li>
+    </ul>
+  </nav>
+
+  <div class="main">
+    <div class="section">
+      <h2>Lista de Palestrantes</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th>Descrição</th>
+            <th>Foto</th>
+            <th>Redes</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody id="palestrante-list"></tbody>
+      </table>
+      <button class="add-btn" onclick="abrirFormulario()">+ Adicionar Novo Palestrante</button>
+    </div>
+  </div>
+
+  <!-- Modal de formulário -->
+  <div id="form-modal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="fecharFormulario()">&times;</span>
+      <h3>Novo Palestrante</h3>
+      <form id="palestrante-form">
+        <label>Nome:</label>
+        <input type="text" id="nome" required />
+        <label>Descrição:</label>
+        <textarea id="descricao" required></textarea>
+        <label>Foto (URL):</label>
+        <input type="text" id="foto" required />
+        <label>Instagram:</label>
+        <input type="text" id="instagram" />
+        <label>LinkedIn:</label>
+        <input type="text" id="linkedin" />
+        <label>YouTube:</label>
+        <input type="text" id="youtube" />
+        <label>Site:</label>
+        <input type="text" id="site" />
+        <button type="submit" class="submit-btn">Salvar</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="palestranteScript.js"></script>
+</body>
+</html>
