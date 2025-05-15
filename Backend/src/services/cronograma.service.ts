@@ -1,16 +1,17 @@
 import { CronogramaDao } from "../dao/cronograma.dao";
 import { CreateCronogramaDTO } from "../dto/cronograma.dto";
 import { Cronograma, cronogramaProps } from "../model/Cronograma";
+import { HistoricoSaver } from "../utils/historico.saver";
 import { HistoricoService } from "./historico.service";
 
 export class CronogramaService {
     constructor(
-        private readonly dao: CronogramaDao,
-        private readonly historico: HistoricoService
+        private readonly dao: CronogramaDao
     ) {}
 
-    public async create(dto: CreateCronogramaDTO, userId: string): Promise<Cronograma> {
-        try{const cronograma = Cronograma.build(
+    public async create(dto: CreateCronogramaDTO, user: string): Promise<Cronograma> {
+        try{
+            const cronograma = Cronograma.build(
             dto.nome,
             dto.descricao,
             new Date(dto.horario),
@@ -20,7 +21,7 @@ export class CronogramaService {
         );
         
         await this.dao.save(cronograma);
-        this.historico.createHistorico("criou", "atividade", userId);
+        await HistoricoSaver.createHistorico("criou", `a atividade \"${cronograma.props.nome}\"`, user);
         return cronograma;
     }catch(error){
             console.error("Erro ao criar cronograma:", error);
@@ -39,27 +40,20 @@ export class CronogramaService {
         return Cronograma.assemble(cronograma);
     }
 
-    public async delete(id: string, userId: string): Promise<void> {
+    public async delete(id: string, user: string): Promise<void> {
+        const atividade = await this.getById(id);
         await this.dao.delete(id);
-        await this.historico.createHistorico(
-            "deletou",
-            "atividade",
-            userId
-        );
+        await HistoricoSaver.createHistorico("deletou", `a atividade \"${atividade?.props.nome}\"`, user);
     }
 
-    public async update(id: string, dto: Partial<CreateCronogramaDTO>, userId: string): Promise<void> {
+    public async update(id: string, dto: Partial<CreateCronogramaDTO>, user: string): Promise<void> {
         const dadosAtualizados: Partial<cronogramaProps> = {
             ...dto,
             horario: dto.horario ? new Date(dto.horario) : undefined,
         }
-    
+        const nomeAntigo = (await this.getById(id))?.props.nome;
         await this.dao.update(id, dadosAtualizados)
-        await this.historico.createHistorico(
-            "atualizou",
-            "atividade",
-            userId
-        );
+        await HistoricoSaver.createHistorico("editou", `a atividade \"${nomeAntigo}\"`, user);
     }
     
     

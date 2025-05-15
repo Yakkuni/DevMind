@@ -1,11 +1,13 @@
 import { Usuario } from "../model/Usuario";
 import { UpdateUserDto } from "../dto/user.dto";
 import { UsuarioDao } from "../dao/usuario.dao";
+import { HistoricoService } from "./historico.service";
+import { HistoricoSaver } from "../utils/historico.saver";
 
 export class UserService {
     constructor(private readonly dao: UsuarioDao) {}
     
-    public async updateUser(id: string, dto: UpdateUserDto): Promise<Usuario> {
+    public async updateUser(id: string, dto: UpdateUserDto, user:string): Promise<Usuario> {
         const usuario = await this.dao.findById(id);
         if (!usuario) throw new Error("Usuário não encontrado");
 
@@ -14,14 +16,16 @@ export class UserService {
         if (dto.password) usuario.setSenha(dto.password);
 
         await this.dao.update(usuario);
+        await HistoricoSaver.createHistorico("atualizou as informações do(a)", `usuário(a) \"${usuario.getNome()}\"`, user);
         return usuario;
     }
 
-    public async deleteUser(id: string): Promise<void> {
+    public async deleteUser(id: string, user: string): Promise<void> {
         const usuario = await this.dao.findById(id);
         if (!usuario) throw new Error("Usuário não encontrado");
 
         await this.dao.delete(id);
+        await HistoricoSaver.createHistorico("deletou o(a)", `usuário(a) \"${usuario.getNome()}\"`, user);
     }
 
     public async getUserById(id: string): Promise<Usuario | null> {

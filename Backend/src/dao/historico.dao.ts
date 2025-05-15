@@ -11,19 +11,19 @@ export class HistoricoDao {
       id: h.id,
       acao: h.acao,
       entidade: h.entidade,
-      usuarioId: h.usuarioId,
+      usuario: h.usuario,
       data: h.data
     }));
   }
 
   async save(historico: Historico): Promise<void> {
-    const { id, acao, entidade, usuarioId, data } = historico.toJSON();
+    const { id, acao, entidade, usuario, data } = historico.toJSON();
     await prisma.historico.create({
       data: {
         id,
         acao,
         entidade,
-        usuarioId,
+        usuario,
         data
       }
     });

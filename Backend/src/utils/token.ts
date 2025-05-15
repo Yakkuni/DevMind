@@ -9,7 +9,7 @@ if (!SECRET) {
 }
 
 export function gerarToken(payload: object): string {
-  return jwt.sign(payload, SECRET as string, { expiresIn: "3h" });
+  return jwt.sign(payload, SECRET as string, { expiresIn: "48h" });
 }
 
 export function verificarToken(token: string): any {

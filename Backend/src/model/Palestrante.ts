@@ -12,7 +12,7 @@ type palestranteProps = {
   };  
 
 export class Palestrante {
-    private constructor(readonly props: palestranteProps) {}
+    private constructor(private readonly props: palestranteProps) {}
 
     public static build(nome: string, descricao: string, foto: string, redes: palestranteProps["redes"]) {
         const props: palestranteProps = {
@@ -31,5 +31,23 @@ export class Palestrante {
 
     public toJSON() {
         return this.props;
+    }
+
+    public getId() {
+        return this.props.id;
+    }
+
+    public getNome() {
+        return this.props.nome;
+    } 
+    public getDescricao() {
+        return this.props.descricao;
+    }
+
+    public getFoto() {
+        return this.props.foto;
+    }
+    public getRedes() {
+        return this.props.redes;
     }
 }

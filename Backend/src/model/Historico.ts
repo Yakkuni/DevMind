@@ -2,19 +2,19 @@ type historicoProps = {
   id: string;
   acao: string;
   entidade: string;
-  usuarioId: string;
+  usuario: string;
   data: Date;
 };
 
 export class Historico {
   private constructor(readonly props: historicoProps) {}
 
-  public static build(acao: string, entidade: string, usuarioId: string) {
+  public static build(acao: string, entidade: string, usuario: string) {
     const props: historicoProps = {
       id: crypto.randomUUID(),
       acao,
       entidade,
-      usuarioId,
+      usuario,
       data: new Date(),
     };
     return new Historico(props);

@@ -26,9 +26,10 @@ export class UserController {
 
     public async updateUser(req: Request, res: Response) {
         try {
+            const usuarioId = ((req as any).usuario.id) as string;
             const id = req.params.id;
             const dto = req.body;
-            const usuario = await this.service.updateUser(id, dto);
+            const usuario = await this.service.updateUser(id, dto, usuarioId);
             res.json(usuario);
         } catch (error) {
             res.status(500).json({ message: (error as Error).message });
@@ -37,8 +38,9 @@ export class UserController {
 
     public async deleteUser(req: Request, res: Response) {
         try {
+            const usuarioId = ((req as any).usuario.id) as string;
             const id = req.params.id;
-            await this.service.deleteUser(id);
+            await this.service.deleteUser(id, usuarioId);
             res.status(204).end().json({message: "Usuário deletado com sucesso"});
         } catch (error) {
             res.status(500).json({ message: (error as Error).message });

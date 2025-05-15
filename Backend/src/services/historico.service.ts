@@ -1,15 +1,15 @@
 import { Historico } from "../model/Historico";
 import { HistoricoDao } from "../dao/historico.dao";
-import e from "express";
+import { UserService } from "./user.service";
 
 export class HistoricoService {
-  constructor(private readonly dao: HistoricoDao) {}
+  constructor(private readonly dao: HistoricoDao, private readonly user: UserService) {}
 
   public async getAllHistoricos(): Promise<{
     id: string;
     acao: string;
     entidade: string;
-    usuarioId: string;
+    usuario: string;
     data: Date;
   }[]> {
     try{const historicos = await this.dao.findAll();
@@ -20,7 +20,7 @@ export class HistoricoService {
         id: props.id,
         acao: props.acao,
         entidade: props.entidade,
-        usuarioId: props.usuarioId,
+        usuario: props.usuario,
         data: props.data,
       };
     });
@@ -30,13 +30,19 @@ export class HistoricoService {
   }
 
   public async createHistorico(acao: string, entidade: string, usuarioId: string): Promise<Historico> {
-    console.log("chegou no service");
-    console.log(acao, entidade, usuarioId);
+    
     try {
-      const historico = Historico.build(acao, entidade, usuarioId);
-      await this.dao.save(historico);
-      return historico;
+      console.log(usuarioId)
+      const usuario = await this.user.getUserById(usuarioId);
+      if (!usuario) {
+        throw new Error("Usuário não encontrado");
+      }
+      else{
+        const historico = Historico.build(acao, entidade, usuario.getNome());
+        await this.dao.save(historico);
+        return historico;}
     } catch (error) {
+      console.error("Erro ao criar historico:", error);
       throw new Error("Erro ao criar historico");
     }
   }

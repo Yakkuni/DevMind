@@ -5,6 +5,7 @@ import { PalestranteDao } from "../dao/palestrante.dao";
 import { PalestranteService } from "../services/palestrante.service";
 import { autenticarRequisicao } from "../utils/auth.middleware"; // Importa o middleware
 
+
 export class PalestranteApi {
     readonly controller: PalestranteController;
 

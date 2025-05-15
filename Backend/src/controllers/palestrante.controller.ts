@@ -7,8 +7,9 @@ export class PalestranteController {
 
     public async criar(req: Request, res: Response) {
         try {
+            const usuarioId = ((req as any).usuario.id) as string;
             const dto: CreatePalestranteDTO = req.body;
-            const palestrante = await this.service.criar(dto);
+            const palestrante = await this.service.criar(dto, usuarioId);
             res.status(201).json(palestrante.toJSON());
         } catch (error) {
             console.error("Erro ao criar palestrante:", error);
@@ -31,15 +32,17 @@ export class PalestranteController {
     }
 
     public async remover(req: Request, res: Response) {
+        const usuarioId = ((req as any).usuario.id) as string;
         const id = req.params.id;
-        await this.service.remover(id);
+        await this.service.remover(id, usuarioId);
         res.status(204).end();
     }
 
     public async atualizar(req: Request, res: Response) {
         const id = req.params.id;
+        const usuarioId = ((req as any).usuario.id) as string;
         const dto: CreatePalestranteDTO = req.body;
-        const palestrante = await this.service.atualizar(id, dto);
+        const palestrante = await this.service.atualizar(id, dto, usuarioId);
         if (!palestrante) {
             return res.status(404).json({ message: "Palestrante não encontrado" });
         }

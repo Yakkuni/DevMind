@@ -3,10 +3,14 @@ import { LoginDTO } from "../dto/auth.dto";
 import { Usuario } from "../model/Usuario";
 import { gerarToken } from "../utils/token";
 import { Cryptography } from "../utils/cryptography";
+import { HistoricoService } from "./historico.service";
+import { HistoricoSaver } from "../utils/historico.saver";
 
 
 export class AuthService {
-  constructor(private readonly dao: UsuarioDao) {}
+  constructor(
+    private readonly dao: UsuarioDao
+  ) {}
 
   // Função de autenticação (login)
   public async autenticar(dto: LoginDTO): Promise<string> {
@@ -23,7 +27,7 @@ export class AuthService {
   }
 
   // Função de registro (cadastro) de um novo usuário
-  public async registrar(nome: string, email: string, cargo: 'admin' | 'comum', senha: string): Promise<void> {
+  public async registrar(nome: string, email: string, cargo: 'admin' | 'comum', senha: string, user:string): Promise<void> {
     // Verifica se já existe um usuário com esse e-mail
     const usuarioExistente = await this.dao.findByEmail(email);
     if (usuarioExistente) throw new Error("E-mail já cadastrado");
@@ -36,6 +40,7 @@ export class AuthService {
 
     // Salva o usuário no banco de dados
     await this.dao.create(usuario);
+    await HistoricoSaver.createHistorico("criou o(a)", `usuário(a) \"${usuario.getNome()}\"`, user);
   }
 
   

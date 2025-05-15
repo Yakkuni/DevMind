@@ -1,11 +1,13 @@
 import { Palestrante } from "../model/Palestrante";
 import { CreatePalestranteDTO } from "../dto/palestrante.dto";
 import { PalestranteDao } from "../dao/palestrante.dao";
+import { HistoricoService } from "./historico.service";
+import { HistoricoSaver } from "../utils/historico.saver";
 
 export class PalestranteService {
     constructor(private readonly dao: PalestranteDao) {}
 
-    public async criar(dto: CreatePalestranteDTO): Promise<Palestrante> {
+    public async criar(dto: CreatePalestranteDTO, user:string): Promise<Palestrante> {
         const redes = this.montarRedes(dto);
 
 
@@ -15,6 +17,7 @@ export class PalestranteService {
             dto.foto, 
             redes);
         await this.dao.save(palestrante);
+        await HistoricoSaver.createHistorico("criou", `palestrante \"${palestrante.getNome()}\"`, user);
         return palestrante;
     }
     
@@ -27,11 +30,14 @@ export class PalestranteService {
         return this.dao.findById(id);
     }
 
-    public async remover(id: string): Promise<void> {
-        await this.dao.deleteById(id);
+    public async remover(id: string, user: string): Promise<void> {
+        try{await this.dao.deleteById(id);
+        await HistoricoSaver.createHistorico("deletou", ` o(a) palestrante \"${id}\"`, user);
+    }catch(error){
+        throw new Error("Erro ao deletar palestrante");}
     }
 
-    public async atualizar(id: string, dto: CreatePalestranteDTO): Promise<Palestrante | null> {
+    public async atualizar(id: string, dto: CreatePalestranteDTO, user: string): Promise<Palestrante | null> {
         const existente = await this.dao.findById(id);
         if (!existente) return null;
     
@@ -44,6 +50,7 @@ export class PalestranteService {
         });
     
         await this.dao.update(atualizado);
+        await HistoricoSaver.createHistorico("editou", ` o(a) palestrante \"${atualizado.getNome()}\"`, user);
         return atualizado;
     }
     

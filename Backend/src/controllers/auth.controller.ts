@@ -17,9 +17,10 @@ export class AuthController {
 
   // Rota de registro
   public async register(req: Request, res: Response) {
+    const usuarioId = ((req as any).usuario.id) as string;
     const { nome, email, cargo, senha } = req.body;
     try {
-      await this.service.registrar(nome, email, cargo, senha);
+      await this.service.registrar(nome, email, cargo, senha, usuarioId);
       res.status(201).json({ message: "Usuário registrado com sucesso!" });
     } catch (error) {
       res.status(400).json({ message: (error as Error).message });
