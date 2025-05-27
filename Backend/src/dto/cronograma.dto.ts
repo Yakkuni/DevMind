@@ -1,9 +1,9 @@
 export interface CreateCronogramaDTO {
     nome: string;
     descricao: string;
-    horario: string; // string para facilitar entrada vinda do JSON
+    horario: string; 
     local: string;
-    tipo: 'Palestra' | 'Minicurso' | 'Outro';
+    tipo: string;
     conduzidoPor: string;
 }
 

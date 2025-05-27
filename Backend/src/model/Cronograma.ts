@@ -4,7 +4,7 @@ export type cronogramaProps = {
     descricao: string,
     horario: Date,
     local: string,
-    tipo: 'Palestra' | 'Minicurso' | 'Outro',
+    tipo: string;
     conduzidoPor: string
 }
 
@@ -16,7 +16,7 @@ export class Cronograma {
         descricao: string,
         horario: Date,
         local: string,
-        tipo: 'Palestra' | 'Minicurso' | 'Outro',
+        tipo: string,
         conduzidoPor: string
     ) {
         const props: cronogramaProps = {
