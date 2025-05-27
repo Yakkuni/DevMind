@@ -2,6 +2,8 @@
   <router-view />
 </template>
 
-<script setup lang="ts">
-// Nenhum script necessário
+<script>
+export default {
+  name: 'App'
+}
 </script>

@@ -1,142 +1,301 @@
 <template>
-  <div class="programming-page">
-    <!-- Header -->
+  <div class="schedule-page">
     <section
-      class="programming-header"
-      :style="{ backgroundImage: `url('${backgroundImage}')` }"
+      class="schedule-header"
+      :style="{ backgroundImage: `url('${headerBackgroundImage}')` }"
     >
-      <div class="header-overlay" :style="{ backgroundColor: overlayColor }"></div>
+      <div class="header-overlay" :style="{ backgroundColor: headerOverlayColor }"></div>
       <div class="header-content">
-        <h1>{{ title }}</h1>
+        <h1>{{ pageTitle }}</h1>
       </div>
     </section>
 
-    <!-- Seletor de Datas -->
-    <section class="date-selector">
-      <div class="date-buttons">
-        <button 
-          v-for="(date, index) in dates" 
-          :key="index" 
-          :class="{ active: selectedDate === date }" 
-          @click="selectedDate = date">
-          {{ date }}
+    <section class="date-selector-section" v-if="!isLoading && availableDates.length > 0">
+      <div class="date-buttons-container">
+        <button
+          v-for="dateDisplay in availableDates"
+          :key="dateDisplay"
+          class="date-button"
+          :class="{ active: selectedDateKey === getCanonicalDateKey(dateDisplay) }"
+          @click="selectDate(getCanonicalDateKey(dateDisplay))"
+        >
+          {{ dateDisplay }}
         </button>
       </div>
     </section>
 
-    <!-- Lista de Atividades -->
-    <section class="schedule">
-      <div 
-        v-for="(event, index) in schedules[selectedDate]" 
-        :key="index" 
-        class="activity-card"
-      >
-        <div class="activity-header">
-          <h2 class="activity-title">{{ event.title }}</h2>
-        </div>
-        <div class="activity-info">
-          <div class="activity-time">
-            <i class="mdi mdi-alarm"></i>
-            <span>{{ event.time }}</span>
+    <section v-if="isLoading" class="feedback-section loading-state">
+      <div class="spinner"></div>
+      <p>Carregando programação...</p>
+    </section>
+    <section v-else-if="errorLoading" class="feedback-section error-state">
+      <p>{{ errorLoading }}</p>
+      <button @click="fetchSchedule" class="btn btn-retry">Tentar Novamente</button>
+    </section>
+    <section v-else-if="availableDates.length === 0" class="feedback-section empty-state">
+      <p>Nenhuma programação disponível no momento.</p>
+    </section>
+
+    <section class="activities-list-section" v-else-if="selectedDateKey && activitiesForSelectedDate.length > 0">
+      <div class="activities-container">
+        <div
+          v-for="activity in activitiesForSelectedDate"
+          :key="activity.id"
+          class="activity-card"
+        >
+          <div class="activity-time-slot">
+            <span class="time">{{ formatTime(activity.horario) }}
+              <template v-if="activity.horaFim"> - {{ activity.horaFim }}</template>
+            </span>
+            <span class="type" v-if="activity.tipo">{{ activity.tipo }}</span>
           </div>
-          <div class="activity-location">
-            <i class="mdi mdi-map-marker"></i>
-            <span>{{ event.location }}</span>
+          <div class="activity-details">
+            <h2 class="activity-title">{{ activity.nome }}</h2>
+            <p class="activity-description" v-if="activity.descricao">{{ activity.descricao }}</p>
+            <div class="activity-meta">
+              <div class="meta-item location" v-if="activity.local">
+                <i class="mdi mdi-map-marker"></i> <span>{{ activity.local }}</span>
+              </div>
+              <div class="meta-item speaker" v-if="activity.conduzidoPor">
+                <i class="mdi mdi-account-voice"></i> <span>{{ activity.conduzidoPor }}</span>
+              </div>
+            </div>
           </div>
         </div>
-        <p class="activity-description">{{ event.description }}</p>
       </div>
+    </section>
+    <section v-else-if="selectedDateKey && activitiesForSelectedDate.length === 0" class="feedback-section empty-state">
+      <p>Nenhuma atividade programada para {{ getDisplayDate(selectedDateKey) || 'este dia' }}.</p>
     </section>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, onMounted, computed } from 'vue';
+import axios from 'axios';
 
-const backgroundImage = '/path/to/your/placeholder-background.jpg'; // Substitua pelo caminho da imagem desejada.
-const overlayColor = 'rgba(72, 12, 168, 0.7)'; // Cor principal do evento com opacidade.
-const title = 'Programação';
+const headerBackgroundImage = ref('/img/banners/schedule_banner.jpg');
+const headerOverlayColor = ref('rgba(19, 16, 71, 0.75)'); // $complemento com opacidade
+const pageTitle = ref('Programação Oficial');
 
-// Datas de exemplo com rótulo mais descritivo
-const dates = ref([
-  '11/11 - Segunda-feira',
-  '12/11 - Terça-feira',
-  '13/11 - Quarta-feira'
-]);
+// --- Tipagem ---
+// Interface reflete os campos vindos da API/banco de dados
+interface CronogramaItemAPI {
+  id: string;
+  nome: string; // Título da atividade
+  descricao?: string | null;
+  horario: string; // Data e hora completas (ISO string), representa o INÍCIO
+  local?: string | null;
+  tipo: string; // Ex: Palestra, Workshop
+  conduzidoPor?: string | null; // Nome do palestrante/responsável
 
-// Seleciona a primeira data por padrão.
-const selectedDate = ref(dates.value[0]);
-
-interface EventItem {
-  title: string;
-  time: string;
-  location: string;
-  description: string;
+  // Opcional: Se sua API for modificada para enviar horaFim separadamente
+  horaFim?: string | null; // Formato "HH:mm"
 }
 
-// Exemplo de agenda para cada data (atividades ordenadas por horário)
-const schedules: Record<string, EventItem[]> = {
-  '11/11 - Segunda-feira': [
-    {
-      title: 'Credenciamento',
-      time: '08:00 às 09:00',
-      location: 'Entrada do IFCE',
-      description: 'Recepção dos participantes e distribuição de credenciais.'
-    },
-    {
-      title: 'Falas das Diretorias',
-      time: '09:00 às 09:30',
-      location: 'Auditório Principal',
-      description: 'Discurso inicial das diretorias do evento.'
-    }
-  ],
-  '12/11 - Terça-feira': [
-    {
-      title: 'Credenciamento',
-      time: '13:30 às 14:30',
-      location: 'Entrada do IFCE',
-      description: 'Recepção e credenciamento com entrega de materiais.'
-    },
-    {
-      title: 'Abertura Oficial',
-      time: '14:30 às 16:00',
-      location: 'Auditório Central',
-      description: 'Discurso de abertura do evento com painel de debates.'
-    }
-  ],
-  '13/11 - Quarta-feira': [
-    {
-      title: 'Workshop de Desenvolvimento',
-      time: '10:00 às 11:30',
-      location: 'Sala de Workshop',
-      description: 'Sessão prática sobre novas tecnologias e frameworks.'
-    },
-    {
-      title: 'Painel de Discussão',
-      time: '11:30 às 12:30',
-      location: 'Auditório Central',
-      description: 'Debate com especialistas sobre o futuro da tecnologia.'
-    }
-  ]
+const allActivities = ref<CronogramaItemAPI[]>([]);
+const availableDates = ref<string[]>([]);
+const selectedDateKey = ref<string | null>(null);
+
+const isLoading = ref(true);
+const errorLoading = ref<string | null>(null);
+
+// --- Funções de Data e Hora ---
+const formatDateForDisplay = (isoDateString: string): string => {
+  if (!isoDateString) return "Data inválida";
+  const date = new Date(isoDateString);
+  const userTimezoneOffset = date.getTimezoneOffset() * 60000;
+  const localDate = new Date(date.getTime() + userTimezoneOffset);
+  if (isNaN(localDate.getTime())) return "Data inválida";
+  const day = localDate.getDate().toString().padStart(2, '0');
+  const month = (localDate.getMonth() + 1).toString().padStart(2, '0');
+  const weekday = localDate.toLocaleDateString('pt-BR', { weekday: 'long' });
+  return `${day}/${month} - ${weekday.charAt(0).toUpperCase() + weekday.slice(1).replace('-feira', '')}`;
 };
+
+const getCanonicalDateKey = (dateInput: string): string => {
+  if (/^\d{4}-\d{2}-\d{2}$/.test(dateInput)) return dateInput;
+  const displayMatch = dateInput.match(/^(\d{2})\/(\d{2})/);
+  if (displayMatch) {
+    const eventYear = new Date(allActivities.value.length > 0 ? allActivities.value[0].horario : Date.now()).getFullYear();
+    return `${eventYear}-${displayMatch[2]}-${displayMatch[1]}`;
+  }
+  const dateObj = new Date(dateInput);
+  if (!isNaN(dateObj.getTime())) {
+    const userTimezoneOffset = dateObj.getTimezoneOffset() * 60000;
+    const localDate = new Date(dateObj.getTime() + userTimezoneOffset);
+    return `${localDate.getFullYear()}-${(localDate.getMonth() + 1).toString().padStart(2, '0')}-${localDate.getDate().toString().padStart(2, '0')}`;
+  }
+  console.warn("Não foi possível converter a data para chave canônica:", dateInput);
+  return dateInput;
+};
+
+const getDisplayDate = (canonicalKey: string | null): string | null => {
+    if (!canonicalKey) return null;
+    const foundDate = availableDates.value.find(d => getCanonicalDateKey(d) === canonicalKey);
+    return foundDate || canonicalKey;
+};
+
+// Nova função para formatar apenas a hora de início a partir do campo 'horario'
+const formatTime = (isoDateString: string): string => {
+  if (!isoDateString) return "HH:MM";
+  const date = new Date(isoDateString);
+  const userTimezoneOffset = date.getTimezoneOffset() * 60000;
+  const localDate = new Date(date.getTime() + userTimezoneOffset);
+  if (isNaN(localDate.getTime())) return "HH:MM";
+  const hours = localDate.getHours().toString().padStart(2, '0');
+  const minutes = localDate.getMinutes().toString().padStart(2, '0');
+  return `${hours}:${minutes}`;
+};
+
+// --- Processamento e Agrupamento de Dados ---
+const groupedActivities = computed(() => {
+  const groups: Record<string, CronogramaItemAPI[]> = {};
+  if (!Array.isArray(allActivities.value)) return groups;
+
+  allActivities.value.forEach(activity => {
+    // CORREÇÃO: Usar activity.horario para obter a data
+    if (activity && activity.horario) {
+      const dateKey = getCanonicalDateKey(activity.horario);
+      if (!groups[dateKey]) {
+        groups[dateKey] = [];
+      }
+      groups[dateKey].push(activity);
+    }
+  });
+
+  for (const dateKey in groups) {
+    // CORREÇÃO: Usar activity.horario para obter a hora de início para ordenação
+    groups[dateKey].sort((a, b) => {
+        const timeA = formatTime(a.horario); // Formata para HH:mm para comparação consistente
+        const timeB = formatTime(b.horario);
+        return timeA.localeCompare(timeB);
+    });
+  }
+  return groups;
+});
+
+const activitiesForSelectedDate = computed(() => {
+  if (!selectedDateKey.value || !groupedActivities.value[selectedDateKey.value]) {
+    return [];
+  }
+  return groupedActivities.value[selectedDateKey.value];
+});
+
+// --- Busca de Dados ---
+async function fetchSchedule() {
+  isLoading.value = true;
+  errorLoading.value = null;
+  try {
+    const response = await axios.get<CronogramaItemAPI[]>('http://localhost:3000/cronograma'); // Usando URL completa por enquanto
+
+    if (Array.isArray(response.data)) {
+      allActivities.value = response.data;
+    } else {
+      console.warn("A API /cronograma não retornou um array. Recebido:", response.data, "Tratando como array vazio.");
+      allActivities.value = [];
+    }
+
+    const uniqueDisplayDates = new Set<string>();
+    if (Array.isArray(allActivities.value)) {
+      allActivities.value.forEach(activity => {
+        // CORREÇÃO: Usar activity.horario para formatar a data de display
+        if (activity && activity.horario) {
+          uniqueDisplayDates.add(formatDateForDisplay(activity.horario));
+        } else {
+          console.warn("Atividade inválida ou sem campo 'horario' no backend:", activity);
+        }
+      });
+    }
+
+    availableDates.value = Array.from(uniqueDisplayDates).sort((dateA, dateB) => {
+        const keyA = getCanonicalDateKey(dateA);
+        const keyB = getCanonicalDateKey(dateB);
+        try {
+            return new Date(keyA).getTime() - new Date(keyB).getTime();
+        } catch (e) {
+            console.error("Erro ao converter datas para ordenação:", keyA, keyB, e);
+            return 0;
+        }
+    });
+
+    if (availableDates.value.length > 0) {
+      selectedDateKey.value = getCanonicalDateKey(availableDates.value[0]);
+    } else {
+      selectedDateKey.value = null;
+    }
+
+  } catch (err: any) {
+    console.error("---------------------------------------");
+    console.error("Erro no bloco catch de fetchSchedule:", err);
+    let errorMessage = 'Falha ao carregar a programação. Verifique sua conexão ou tente mais tarde.';
+    if (err.response) {
+      console.error("Detalhes do erro da API - Data:", err.response.data);
+      console.error("Detalhes do erro da API - Status:", err.response.status);
+      if(err.response.status === 404) errorMessage = "Endpoint da programação não encontrado.";
+      else if (err.response.status >= 500) errorMessage = "Ocorreu um erro no servidor ao buscar a programação.";
+    } else if (err.request) {
+      console.error("Detalhes do erro da API - Sem resposta recebida:", err.request);
+      errorMessage = "Não foi possível conectar ao servidor da programação.";
+    } else {
+      console.error('Erro ao configurar a requisição:', err.message);
+    }
+    errorLoading.value = errorMessage;
+    console.error("---------------------------------------");
+    allActivities.value = [];
+    availableDates.value = [];
+    selectedDateKey.value = null;
+  } finally {
+    isLoading.value = false;
+  }
+}
+
+const selectDate = (dateKey: string) => {
+  selectedDateKey.value = dateKey;
+};
+
+onMounted(() => {
+  fetchSchedule();
+});
+
 </script>
 
 <style scoped lang="scss">
-.programming-page {
+// SEU SCSS EXISTENTE (SEM MUDANÇAS SIGNIFICATIVAS AQUI, POIS O PROBLEMA ERA DE LÓGICA)
+// ... (cole seu SCSS aqui) ...
+// Suas variáveis globais (assumindo que estão disponíveis)
+$principal: #2C2966;
+$complemento: #131047;
+$complementoCLaro: #6C6C94;
+$destaque: #FFA051;
+$branco: #ffffff;
+$preto: #000000;
+$cinza-borda: #d1d5db;
+$cinza-fundo-claro: #f9fafb; // Alterado para um tom ligeiramente diferente do anterior
+
+.schedule-page {
   display: flex;
   flex-direction: column;
+  background-color: $cinza-fundo-claro;
+  min-height: 100vh;
 }
 
-/* HEADER */
-.programming-header {
+/* Header da Página */
+.schedule-header {
   position: relative;
   width: 100%;
-  height: 300px; /* Ajuste conforme necessário */
+  min-height: 300px; // Reduzido um pouco
   background-size: cover;
   background-position: center;
   display: flex;
   align-items: center;
   justify-content: center;
+  color: $branco;
+  background-color: $complemento; // Fallback e cor base
+
+  @media (max-width: 768px) {
+    min-height: 220px; // Reduzido para mobile
+  }
 }
 
 .header-overlay {
@@ -145,136 +304,239 @@ const schedules: Record<string, EventItem[]> = {
   left: 0;
   width: 100%;
   height: 100%;
-  opacity: 0.8;
+  // A cor é definida via style binding, ex: rgba($complemento, 0.75)
 }
 
 .header-content {
   position: relative;
   z-index: 1;
   text-align: center;
-  color: #fff;
-  padding: 20px;
+  padding: 1.5rem; // Padding reduzido
 
   h1 {
-    font-size: 3rem;
+    font-size: clamp(2rem, 5vw, 3rem); // Tamanho ajustado
+    font-weight: 700;
     margin: 0;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    text-shadow: 0 2px 6px rgba($preto, 0.6); // Sombra mais pronunciada
+    color: $branco;
   }
 }
 
-/* DATE SELECTOR */
-.date-selector {
-  margin: 2rem 0;
+/* Seletor de Datas */
+.date-selector-section {
+  padding: 1.5rem 1rem; // Padding ajustado
+  background-color: $branco;
+  box-shadow: 0 4px 12px rgba($preto, 0.06); // Sombra mais suave
+  position: sticky;
+  top: 0; // Ajuste para a altura da sua Navbar se ela for fixa
+  z-index: 900;
+  border-bottom: 1px solid $cinza-borda;
+}
+
+.date-buttons-container {
   display: flex;
   justify-content: center;
+  gap: 0.75rem; // Gap reduzido
+  flex-wrap: wrap;
+  max-width: 1200px;
+  margin: 0 auto;
+}
 
-  .date-buttons {
-    display: flex;
-    gap: 1rem;
-    flex-wrap: wrap;
+.date-button {
+  padding: 0.6rem 1.25rem; // Padding ajustado
+  border: 1px solid $cinza-borda; // Borda mais suave
+  background-color: $branco;
+  color: $complementoCLaro;
+  border-radius: 20px;
+  font-size: clamp(0.85rem, 1.8vw, 0.95rem); // Tamanho ajustado
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease-out;
+  min-width: 160px;
+  text-align: center;
+  box-shadow: 0 1px 3px rgba($preto, 0.05);
 
-    button {
-      padding: 0.75rem 1.5rem;
-      border: 1px solid #ccc;
-      background-color: #f0f0f0;
-      color: #333;
-      border-radius: 4px;
-      font-size: 1rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background-color 0.3s, color 0.3s;
-      min-width: 180px;
+  &:hover {
+    border-color: darken($destaque, 10%);
+    color: darken($destaque, 10%);
+    transform: translateY(-1px);
+    box-shadow: 0 3px 8px rgba($preto, 0.07);
+  }
 
-      &.active,
-      &:hover {
-        background-color: #333;
-        color: #fff;
-      }
-    }
+  &.active {
+    background-color: $principal;
+    color: $branco;
+    border-color: $principal;
+    box-shadow: 0 4px 10px rgba($principal, 0.25);
+    transform: translateY(0); // Remove o translateY do hover para o ativo
   }
 }
 
-/* SCHEDULE / AGENDA */
-.schedule {
-  max-width: 1400px;
-  width: 100%;
-  margin: 0 auto 2rem;
-  padding: 0 1rem;
+/* Feedback (Carregamento, Erro, Vazio) */
+.feedback-section {
+  text-align: center;
+  padding: 3rem 1rem; // Padding ajustado
+  color: $complementoCLaro;
+  font-size: 1.05rem; // Tamanho ajustado
 
-  .activity-card {
-    background-color: #fff;
-    border: 1px solid #480ca8; /* Borda roxa escuro */
-    border-radius: 4px;
-    padding: 1.5rem; /* Aumento do padding para maior altura */
-    min-height: 150px; /* Define uma altura mínima */
-    margin-bottom: 1.5rem;
-    display: flex;
+  p {
+    margin-bottom: 1.25rem; // Margem ajustada
+  }
+  .btn-retry {
+    padding: 0.7rem 1.8rem;
+    background-color: $destaque;
+    color: $principal;
+    border: 2px solid $destaque;
+    font-weight: 600;
+    font-size: clamp(0.85rem, 1.8vw, 1rem);
+    border-radius: 25px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba($complemento, 0.2);
+
+    &:hover {
+      background-color: darken($destaque, 10%);
+      border-color: darken($destaque, 10%);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba($complemento, 0.3);
+    }
+  }
+}
+.loading-state .spinner {
+  border: 4px solid rgba($principal, 0.15); // Cor do rastro mais clara
+  border-top-color: $destaque;
+  border-radius: 50%;
+  width: 45px; // Tamanho ajustado
+  height: 45px;
+  animation: spin 0.7s linear infinite; // Velocidade ajustada
+  margin: 0 auto 1.25rem auto;
+}
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+/* Lista de Atividades */
+.activities-list-section {
+  padding: 1.5rem 1rem 3rem 1rem; // Padding ajustado
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.activity-card {
+  background-color: $branco;
+  border-radius: 10px; // Raio de borda ajustado
+  margin-bottom: 1.25rem; // Margem ajustada
+  box-shadow: 0 4px 15px rgba($preto, 0.06); // Sombra ajustada
+  display: flex;
+  overflow: hidden;
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+
+  &:hover {
+    transform: translateY(-3px); // Efeito hover sutil
+    box-shadow: 0 8px 25px rgba($preto, 0.08);
+  }
+
+  @media (max-width: 768px) {
     flex-direction: column;
-    gap: 0.5rem;
+  }
+}
+
+.activity-time-slot {
+  background-color: $principal;
+  color: $branco;
+  padding: 1.25rem 1rem; // Padding ajustado
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  flex-shrink: 0;
+  min-width: 130px; // Largura ajustada
+
+  .time {
+    font-size: 1.1rem; // Tamanho ajustado
+    font-weight: 700;
+    line-height: 1.2;
+  }
+  .type {
+    font-size: 0.75rem; // Tamanho ajustado
+    text-transform: uppercase;
+    background-color: $destaque; // Usando $destaque diretamente
+    color: $principal;
+    padding: 0.3rem 0.7rem; // Padding ajustado
+    border-radius: 12px; // Raio ajustado
+    margin-top: 0.6rem; // Margem ajustada
+    font-weight: 600;
+    letter-spacing: 0.5px;
   }
 
-  .activity-header {
-    display: flex;
+  @media (max-width: 768px) {
+    min-width: 100%;
+    padding: 0.9rem; // Padding ajustado
+    flex-direction: row;
     justify-content: space-between;
-    align-items: center;
-
-    .activity-title {
-      font-size: 1.6rem;
-      margin: 0;
-      color: #333;
-      font-weight: 600;
-    }
+    border-bottom: 3px solid $destaque; // Borda de destaque mais grossa
+    .time { font-size: 1rem; }
+    .type { margin-top: 0; }
   }
+}
 
-  .activity-info {
-    display: flex;
-    gap: 2rem;
-    flex-wrap: wrap;
-    align-items: center;
+.activity-details {
+  padding: 1.25rem 1.5rem; // Padding ajustado
+  flex-grow: 1;
 
-    .activity-time,
-    .activity-location {
-      display: flex;
-      align-items: center;
-      gap: 0.3rem;
-      font-size: 1rem;
-      color: #555;
-
-      i {
-        font-size: 1.2rem;
-        color: #333;
-      }
-    }
+  .activity-title {
+    font-size: 1.35rem; // Tamanho ajustado
+    font-weight: 700;
+    color: $complemento;
+    margin: 0 0 0.6rem 0; // Margem ajustada
   }
 
   .activity-description {
-    font-size: 1rem;
-    color: #555;
-    margin: 0;
+    font-size: 0.9rem; // Tamanho ajustado
+    color: $complementoCLaro;
+    line-height: 1.6;
+    margin-bottom: 0.9rem; // Margem ajustada
+  }
+
+  .activity-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem 1.25rem; // Gap ajustado
+    font-size: 0.85rem; // Tamanho ajustado
+    color: $complementoCLaro;
+
+    .meta-item {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem; // Gap ajustado
+
+      i.mdi {
+        font-size: 1.1rem; // Tamanho ajustado
+        color: $destaque;
+      }
+      &.speaker span {
+        font-weight: 500;
+        color: darken($complementoCLaro, 15%); // Cor ajustada
+      }
+    }
+  }
+  @media (max-width: 768px) {
+    padding: 1rem 1.25rem; // Padding ajustado
+    .activity-title { font-size: 1.2rem; }
+    .activity-description { font-size: 0.85rem; }
   }
 }
 
-/* RESPONSIVO */
+/* Ajustes Gerais de Responsividade */
 @media (max-width: 768px) {
-  .header-content h1 {
-    font-size: 2rem;
+  .date-selector-section {
+    padding: 1.25rem 0.5rem; // Padding ajustado
   }
-  
-  .date-selector .date-buttons {
-    flex-direction: column;
-    align-items: center;
-    
-    button {
-      width: 100%;
-      max-width: 250px;
-      text-align: center;
-    }
-  }
-  
-  .schedule .activity-card {
-    .activity-info {
-      flex-direction: column;
-      align-items: flex-start;
+  .date-buttons-container {
+    gap: 0.6rem;
+    button.date-button {
+      width: calc(50% - 0.4rem); // Ajustado para novo gap
+      padding: 0.6rem 0.4rem; // Padding ajustado
+      font-size: 0.8rem; // Tamanho ajustado
     }
   }
 }

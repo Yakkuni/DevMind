@@ -1,3 +1,5 @@
+// Em router/index.ts
+
 import { createRouter, createWebHistory } from 'vue-router';
 import PublicLayout from '../layouts/PublicLayout.vue';
 import AdminLayout from '../layouts/AdminLayout.vue';
@@ -5,29 +7,21 @@ import AdminLayout from '../layouts/AdminLayout.vue';
 import HomePage from '../pages/HomePage.vue';
 import SchedulePage from '../pages/SchedulePage.vue';
 import SponsorsPage from '../pages/SponsorsPage.vue';
-import LoginPage from '../pages/LoginPage.vue';
-import DashboardPage from '../pages/DashboardPage.vue';
+import LoginPage from '../pages/ADM/LoginPage.vue';
+import DashboardPage from '../pages/ADM/DashboardPage.vue';
+import CronogramaAdminPage from '../pages/ADM/CronogramaDashboard.vue';
+// 1. Importe o componente da página de histórico (crie este arquivo se não existir)
+import HistoricoAdminPage from '../pages/ADM/HistoricoAdminPage.vue'; // Ajuste o caminho se necessário
 
 const routes = [
+  // ... suas rotas públicas ...
   {
     path: '/',
     component: PublicLayout,
     children: [
-      {
-        path: '',
-        name: 'Home',
-        component: HomePage,
-      },
-      {
-        path: 'programacao',
-        name: 'Programacao',
-        component: SchedulePage,
-      },
-      {
-        path: 'patrocinadores',
-        name: 'Patrocinadores',
-        component: SponsorsPage,
-      },
+      { path: '', name: 'Home', component: HomePage },
+      { path: 'programacao', name: 'Programacao', component: SchedulePage },
+      { path: 'patrocinadores', name: 'Patrocinadores', component: SponsorsPage },
     ],
   },
   {
@@ -43,27 +37,48 @@ const routes = [
         path: 'dashboard',
         name: 'Dashboard',
         component: DashboardPage,
-        meta: { requiresAuth: true }, // <- rota protegida
+        meta: { requiresAuth: true },
+      },
+      {
+        path: 'cronograma',
+        name: 'AdminCronograma',
+        component: CronogramaAdminPage,
+        meta: { requiresAuth: true },
+      },
+      // 2. Adicione a nova rota para o histórico aqui
+      {
+        path: 'historico', // Acessível em /DevmindADM/historico
+        name: 'AdminHistorico',
+        component: HistoricoAdminPage,
+        meta: { requiresAuth: true }, // Provavelmente requer autenticação também
       },
     ],
   },
+  // ... (rota NotFound comentada ou removida) ...
 ];
 
 const router = createRouter({
-  history: createWebHistory(),
+  history: createWebHistory(import.meta.env.BASE_URL),
   routes,
+  scrollBehavior(to, from, savedPosition) {
+    if (savedPosition) {
+      return savedPosition;
+    } else {
+      return { top: 0 };
+    }
+  },
 });
 
-// Proteção de rotas
 router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('token');
-
   const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
 
   if (requiresAuth && !token) {
-    return next('/DevmindADM');
+    return next({ name: 'LoginADM', query: { redirect: to.fullPath } });
   }
-
+  if (to.name === 'LoginADM' && token) {
+    return next({ name: 'Dashboard' });
+  }
   next();
 });
 
