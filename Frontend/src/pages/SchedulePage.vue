@@ -26,14 +26,14 @@
 
     <section v-if="isLoading" class="feedback-section loading-state">
       <div class="spinner"></div>
-      <p>Carregando programação...</p>
+      <p>Carregando cronograma...</p>
     </section>
     <section v-else-if="errorLoading" class="feedback-section error-state">
       <p>{{ errorLoading }}</p>
       <button @click="fetchSchedule" class="btn btn-retry">Tentar Novamente</button>
     </section>
     <section v-else-if="availableDates.length === 0" class="feedback-section empty-state">
-      <p>Nenhuma programação disponível no momento.</p>
+      <p>Nenhum cronograma disponível no momento.</p>
     </section>
 
     <section class="activities-list-section" v-else-if="selectedDateKey && activitiesForSelectedDate.length > 0">
@@ -76,7 +76,7 @@ import axios from 'axios';
 
 const headerBackgroundImage = ref('/img/banners/schedule_banner.jpg');
 const headerOverlayColor = ref('rgba(19, 16, 71, 0.75)'); // $complemento com opacidade
-const pageTitle = ref('Programação Oficial');
+const pageTitle = ref('Cronograma Oficial');
 
 // --- Tipagem ---
 // Interface reflete os campos vindos da API/banco de dados
@@ -228,15 +228,15 @@ async function fetchSchedule() {
   } catch (err: any) {
     console.error("---------------------------------------");
     console.error("Erro no bloco catch de fetchSchedule:", err);
-    let errorMessage = 'Falha ao carregar a programação. Verifique sua conexão ou tente mais tarde.';
+    let errorMessage = 'Falha ao carregar o cronograma. Verifique sua conexão ou tente mais tarde.';
     if (err.response) {
       console.error("Detalhes do erro da API - Data:", err.response.data);
       console.error("Detalhes do erro da API - Status:", err.response.status);
-      if(err.response.status === 404) errorMessage = "Endpoint da programação não encontrado.";
-      else if (err.response.status >= 500) errorMessage = "Ocorreu um erro no servidor ao buscar a programação.";
+      if(err.response.status === 404) errorMessage = "Endpoint do cronograma não encontrado.";
+      else if (err.response.status >= 500) errorMessage = "Ocorreu um erro no servidor ao buscar o cronograma.";
     } else if (err.request) {
       console.error("Detalhes do erro da API - Sem resposta recebida:", err.request);
-      errorMessage = "Não foi possível conectar ao servidor da programação.";
+      errorMessage = "Não foi possível conectar ao servidor do cronograma.";
     } else {
       console.error('Erro ao configurar a requisição:', err.message);
     }
