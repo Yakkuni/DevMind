@@ -1,16 +1,67 @@
+/* Reset fundamental para remover margens/paddings padrão e definir box-sizing */
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  overflow-x: hidden; /* Previne scroll horizontal indesejado */
+  font-family: 'Montserrat', sans-serif; /* Aplicar a fonte globalmente aqui */
+  /* Considerar min-height para garantir que o body preencha a viewport em páginas com pouco conteúdo */
+  /* min-height: 100vh; */
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  /* A fonte é herdada de html/body, então não precisa repetir 'font-family' aqui
+     a menos que você tenha algum elemento que não a herde por padrão. */
+}
+
+/* Estilos para o elemento raiz do seu app Vue (opcional, mas bom para altura mínima) */
+#app { /* Ou qualquer que seja o ID do seu elemento raiz do Vue no index.html */
+  min-height: 100vh;
+  /* Se você quiser que o #app tenha o background e não o :root/body, defina aqui.
+     Por padrão, #app será transparente e mostrará o background do body/html. */
+}
+
+/* Definições de tema de cores usando :root */
 :root {
-  background-color: #242424;
-  
-  
+  /* Tema Escuro Padrão */
+  background-color: #242424; /* Seu fundo escuro */
+  color: #f0f0f0; /* Cor de texto padrão sugerida para bom contraste no tema escuro */
+
+  /* Se você tiver suas variáveis SCSS ($principal, etc.) convertidas para variáveis CSS,
+     elas poderiam ser definidas aqui ou em cada tema. Exemplo:
+     --cor-principal: #2C2966;
+     --cor-destaque: #FFA051;
+  */
 }
 
 @media (prefers-color-scheme: light) {
   :root {
-    background-color: #ffffff;
+    /* Tema Claro */
+    background-color: #ffffff; /* Seu fundo claro */
+    color: #213547; /* Cor de texto padrão sugerida para bom contraste no tema claro */
+
+    /* Variáveis CSS poderiam ser sobrescritas para o tema claro aqui, se necessário */
+    /* --cor-principal: #xxxxxx; (se for diferente no tema claro) */
   }
   
-  body {
-    font-family: 'Montserrat', sans-serif;
-  }
-  
+  /* A definição de font-family para 'body' que estava aqui foi movida para
+     a regra global de 'html, body' no início do arquivo,
+     para que seja aplicada independentemente do tema de cores. */
 }
+
+/* Nota sobre SCSS vs CSS:
+   O código acima é CSS puro. Suas variáveis SCSS ($principal, $destaque, etc.)
+   são usadas dentro dos seus componentes Vue (<style lang="scss" scoped>).
+   Se você quiser usar essas mesmas cores para o fundo global da página,
+   você teria algumas opções:
+   1. Definir o background do `body` ou `html` em um arquivo SCSS global
+      que tenha acesso a essas variáveis.
+   2. Converter suas variáveis SCSS para variáveis CSS Custom Properties em :root
+      (como no exemplo comentado) e usá-las tanto no CSS global quanto nos componentes.
+      Ex: background-color: var(--cor-principal);
+   A abordagem atual com `background-color` em `:root` funciona bem para o fundo geral da página.
+*/

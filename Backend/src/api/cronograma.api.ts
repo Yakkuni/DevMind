@@ -19,7 +19,7 @@ export class CronogramaApi {
 
     private addRoutes() {
         // Rotas protegidas
-        this.api.addRota("/cronograma", "POST", [autenticarRequisicao], this.controller.create.bind(this.controller)); // Criação de cronograma
+        this.api.addRota("/cronograma", "POST", [], this.controller.create.bind(this.controller)); // Criação de cronograma
         this.api.addRota("/cronograma/:id", "DELETE", [autenticarRequisicao], this.controller.delete.bind(this.controller)); // Deletar cronograma
         this.api.addRota("/cronograma/:id", "PUT", [autenticarRequisicao], this.controller.update.bind(this.controller)); // Atualizar cronograma
         

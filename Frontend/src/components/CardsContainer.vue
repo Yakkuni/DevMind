@@ -23,22 +23,22 @@
       title: 'Conteúdo',
       description: 'O evento tem minicursos, palestras, oficinas de programação e montagem de robôs, debates sobre tecnologia e mercado tecnologico.',
       image: 'https://thumbs.dreamstime.com/b/selo-do-exemplo-28420393.jpg',
-      bgColor: '#360591',
-      borderColor: '#000'
+      bgColor: '#2C2966',
+      borderColor: '#FFA051'
     },
     {
       title: 'Entretenimento',
       description: 'Competições de jogos digitais, decoração tématica, quiz nerd e sala com computadores.',
       image: 'https://thumbs.dreamstime.com/b/selo-do-exemplo-28420393.jpg',
-      bgColor: '#6C3BAA',
-      borderColor: '#000'
+      bgColor: '#131047',
+      borderColor: '#FFA051'
     },
     {
       title: 'Descanso',
       description: 'Espaço para você sair da correria, se sentar e descansar em salas climatizadas para retomar o folego e aproveitar o evento.',
       image: 'https://thumbs.dreamstime.com/b/selo-do-exemplo-28420393.jpg',
-      bgColor: '#B69CD0',
-      borderColor: '#000'
+      bgColor: '#6C6C94',
+      borderColor: '#FFA051'
     }
   ])
   </script>
