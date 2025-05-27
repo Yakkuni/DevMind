@@ -19,7 +19,6 @@ export class AuthApi {
     // Rota de registro precisa de autenticação, pois estamos criando usuários
     api.addRota("/register", "POST", [autenticarRequisicao, autenticarAdmin], controller.register.bind(controller)); // Rota de registro;
 
-    //
 
 
     // checar se o usuário está autenticado

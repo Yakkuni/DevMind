@@ -16,6 +16,9 @@ export class UserApi {
     api.addRota("/user/:id", "GET", [autenticarRequisicao, autenticarAdmin], controller.getUserById.bind(controller));
     api.addRota("/user/:id", "PUT", [autenticarRequisicao, autenticarAdmin], controller.updateUser.bind(controller));
     api.addRota("/user/:id", "DELETE", [autenticarRequisicao, autenticarAdmin], controller.deleteUser.bind(controller));
+
+    api.addRota("/count/users", "GET", [autenticarRequisicao, autenticarAdmin], controller.getUserCount.bind(controller));
+    api.addRota("/count/users/cargo", "GET", [autenticarRequisicao, autenticarAdmin], controller.getUserCountByCargo.bind(controller))
     //api.addRota("/history", "GET", [autenticarRequisicao, autenticarAdmin], controller.history.bind(controller));
     
     }

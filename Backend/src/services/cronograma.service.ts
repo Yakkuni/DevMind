@@ -58,9 +58,16 @@ export class CronogramaService {
     
     
 
-    // Novo método para buscar cronogramas por dia
     public async getByDia(data: string): Promise<Cronograma[]> {
         const cronogramas = await this.dao.getByDia(data);
         return cronogramas.map((cronograma) => Cronograma.assemble(cronograma));
+    }
+
+    public async count(): Promise<number> {
+        try {
+            return await this.dao.count()
+        } catch (error) {
+            throw error
+        }
     }
 }

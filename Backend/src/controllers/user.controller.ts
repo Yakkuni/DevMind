@@ -47,5 +47,29 @@ export class UserController {
         }
     }
 
+    public async getUserCount(req: Request, res: Response) {
+        try {
+            const count = await this.service.countUsers();
+            res.status(200).json({ count });
+        } catch (error) {
+            res.status(500).json({ message: "Erro ao contar usuários." });
+        }
+    }
+
+    public async getUserCountByCargo(req: Request, res: Response) {
+        try {
+        const { cargo } = req.query;
+
+        if (!cargo || (cargo !== 'admin' && cargo !== 'common')) {
+            return res.status(400).json({ message: "Cargo inválido. Use 'admin' ou 'common'." });
+        }
+
+        const count = await this.service.countUsersByCargo(cargo as 'admin' | 'common');
+        res.status(200).json({ count });
+        } catch (error) {
+        res.status(500).json({ message: "Erro ao contar usuários por cargo." });
+        }
+    }
+
 
 }

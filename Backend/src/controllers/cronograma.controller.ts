@@ -54,4 +54,14 @@ export class CronogramaController {
             res.status(500).json({ message: "Erro ao buscar cronogramas para o dia", error });
         }
     }
+
+    public async count(req: Request, res: Response){
+        try {
+            const count = await this.service.count();
+            res.status(200).json({ count });
+        } catch (error) {
+            res.status(500).json({ message: "Erro interno.", error })
+        }
+        
+    }
 }

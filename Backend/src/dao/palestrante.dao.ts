@@ -68,8 +68,17 @@ export class PalestranteDao {
         instagram: redes.instagram,
         linkedin: redes.linkedin,
         youtube: redes.youtube,
-        site: redes.site
+        site: redes.site 
       }
     });
+  }
+
+
+  async count(): Promise<number> {
+    try {
+      return await prisma.palestrante.count()
+    } catch (error) {
+      throw error
+    }
   }
 }

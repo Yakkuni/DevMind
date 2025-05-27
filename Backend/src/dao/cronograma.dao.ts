@@ -57,4 +57,12 @@ export class CronogramaDao {
       tipo: row.tipo as "Palestra" | "Minicurso" | "Outro",
     }));
   }
+
+  public async count(): Promise<number> {
+    try {
+      return await prisma.cronograma.count()
+    } catch (error) {
+      throw error
+    }
+  }
 }

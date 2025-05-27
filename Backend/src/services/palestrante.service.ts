@@ -84,6 +84,14 @@ export class PalestranteService {
             await this.dao.save(palestrante);
         }
     }
+
+    public async countPalestrantes(): Promise<number> {
+        try {
+            return await this.dao.count()
+        } catch (error) {
+            throw error
+        }
+    }
     
     
     

@@ -75,4 +75,17 @@ export class UsuarioDao {
   }
 
 
+  public async count(): Promise<number> {
+    return prisma.usuario.count();
+  }
+
+  public async countByCargo(cargo: 'admin' | 'common'): Promise<number> {
+    return prisma.usuario.count({
+      where: {
+        cargo,
+      },
+    });
+  }
+
+
 }

@@ -73,5 +73,14 @@ export class PalestranteController {
             res.status(500).json({ message: "Erro ao criar palestrantes em lote", error: (error as Error).message });
         }
     }
+
+    public async countPalestrantes(req: Request, res: Response) {
+        try {
+            const count = await this.service.countPalestrantes()
+            res.status(200).json({ count });
+        } catch (error) {
+            res.status(500).json({ message: "Erro interno." })
+        }
+    }
     
 }

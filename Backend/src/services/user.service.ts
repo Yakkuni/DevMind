@@ -46,5 +46,22 @@ export class UserService {
     });
   }
 
+  public async countUsers(): Promise<number> {
+    try{
+      return await this.dao.count();
+    }catch(error){
+      throw error
+    }
+  }
+
+  
+  public async countUsersByCargo(cargo: 'admin' | 'common'): Promise<number> {
+    try{
+      return await this.dao.countByCargo(cargo);
+    }catch(error){
+      throw error
+    }
+    
+  }
 
 }

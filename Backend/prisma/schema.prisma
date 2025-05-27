@@ -61,3 +61,11 @@ model Historico {
   @@map("historico")
 }
 
+model Foto {
+  id        String   @id
+  titulo    String
+  descricao String
+  caminho   String
+}
+
+
