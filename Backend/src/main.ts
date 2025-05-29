@@ -5,6 +5,7 @@ import { CronogramaApi } from './api/cronograma.api'
 import { AuthApi } from './api/auth.api'
 import { UserApi } from './api/user.api'
 import { seedAdmin } from './utils/seedAdmin'
+import { PatrocinadorApi } from './api/patrocinador.api'
 
 async function main() {
     const api = Api.build()
@@ -13,6 +14,7 @@ async function main() {
     CronogramaApi.build(api)
     AuthApi.build(api)
     UserApi.build(api)
+    PatrocinadorApi.build(api)
 
     await seedAdmin();
     

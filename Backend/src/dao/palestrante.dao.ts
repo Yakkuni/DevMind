@@ -1,7 +1,5 @@
-// src/dao/PalestranteDao.ts
-import { PrismaClient } from '@prisma/client';
 import { Palestrante as PalestranteModel } from '../model/Palestrante'; // sua classe domain, se quiser manter
-const prisma = new PrismaClient();
+import { prisma } from "../utils/prisma";
 
 export class PalestranteDao {
   async save(palestrante: PalestranteModel) {

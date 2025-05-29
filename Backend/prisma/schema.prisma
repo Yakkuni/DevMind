@@ -48,7 +48,8 @@ model Patrocinador {
   id         String        @id @default(uuid())
   nome       String
   logo       String        @db.Text
-  redeSocial Json
+  categoria  String
+  redeSocial String
 }
 
 model Historico {

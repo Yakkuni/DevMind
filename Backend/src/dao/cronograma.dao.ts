@@ -1,7 +1,6 @@
-import { PrismaClient } from "@prisma/client";
-import { Cronograma, cronogramaProps } from "../model/Cronograma";
 
-const prisma = new PrismaClient();
+import { Cronograma, cronogramaProps } from "../model/Cronograma";
+import { prisma } from "../utils/prisma";
 
 export class CronogramaDao {
   public async save(cronograma: Cronograma) {

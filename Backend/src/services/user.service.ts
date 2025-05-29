@@ -1,7 +1,6 @@
 import { Usuario } from "../model/Usuario";
 import { UpdateUserDto } from "../dto/user.dto";
 import { UsuarioDao } from "../dao/usuario.dao";
-import { HistoricoService } from "./historico.service";
 import { HistoricoSaver } from "../utils/historico.saver";
 
 export class UserService {

@@ -1,7 +1,6 @@
-import { PrismaClient } from "@prisma/client";
 import { Usuario } from "../model/Usuario";
+import { prisma } from "../utils/prisma";
 
-const prisma = new PrismaClient();
 
 export class UsuarioDao {
   public async create(usuario: Usuario): Promise<void> {

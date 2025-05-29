@@ -1,8 +1,7 @@
-// src/dao/HistoricoDao.ts
-import { PrismaClient } from '@prisma/client';
-import { Historico } from '../model/Historico';
 
-const prisma = new PrismaClient();
+import { Historico } from '../model/Historico';
+import { prisma } from "../utils/prisma";
+
 
 export class HistoricoDao {
   async findAll(): Promise<Historico[]> {

@@ -12,17 +12,17 @@ export class CronogramaService {
     public async create(dto: CreateCronogramaDTO, user: string): Promise<Cronograma> {
         try{
             const cronograma = Cronograma.build(
-            dto.nome,
-            dto.descricao,
-            new Date(dto.horario),
-            dto.local,
-            dto.tipo,
-            dto.conduzidoPor
-        );
-        
-        await this.dao.save(cronograma);
-        await HistoricoSaver.createHistorico("criou", `a atividade \"${cronograma.props.nome}\"`, user);
-        return cronograma;
+                dto.nome,
+                dto.descricao,
+                new Date(dto.horario),
+                dto.local,
+                dto.tipo,
+                dto.conduzidoPor
+            );
+            
+            await this.dao.save(cronograma);
+            await HistoricoSaver.createHistorico("criou", `a atividade \"${cronograma.props.nome}\"`, user);
+            return cronograma;
     }catch(error){
             console.error("Erro ao criar cronograma:", error);
             throw error;
