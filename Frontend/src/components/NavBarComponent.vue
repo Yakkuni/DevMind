@@ -13,7 +13,7 @@
           <router-link to="/" class="nav-link">Início</router-link>
         </li>
         <li class="nav-item">
-          <router-link to="/programacao" class="nav-link">Programação</router-link>
+          <router-link to="/programacao" class="nav-link">Cronograma</router-link>
         </li>
         <li class="nav-item">
           <router-link to="/patrocinadores" class="nav-link">Patrocinadores</router-link>
@@ -131,18 +131,13 @@ const closeSidebarAndHandleLink = (target: string, isExternal: boolean = false) 
 
 
 const handleParticiparClick = () => {
-  // Adicione a lógica para o botão "Participar do Evento" do header
-  // Ex: router.push('/inscricao'); ou abrir um modal
-  console.log("Botão 'Participar do Evento' (header) clicado");
-  closeSidebarAndHandleLink('#inscricao'); // Exemplo de ação
+  console.log("Botão 'Participar do Evento' (Hero) clicado");
+  window.open("https://www.even3.com.br/devmind-571467/", "_blank");
 };
 
 const handleParticiparClickSidebar = () => {
-  // Adicione a lógica para o botão "Participar do Evento" da sidebar
-  console.log("Botão 'Participar do Evento' (sidebar) clicado");
-  closeSidebarAndHandleLink('#inscricao'); // Exemplo de ação
-  // Se for uma navegação de rota, use router.push e feche a sidebar
-  // Ex: router.push('/inscricao'); if (isSidebarActive.value) toggleSidebar();
+  console.log("Botão 'Participar do Evento' (Hero) clicado");
+  window.open("https://www.even3.com.br/devmind-571467/", "_blank");
 };
 
 

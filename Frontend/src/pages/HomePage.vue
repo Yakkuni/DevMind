@@ -56,6 +56,7 @@ import OtherEditions from '../components/OtherEditions.vue';
 
 const handleParticiparClick = () => {
   console.log("Botão 'Participar do Evento' (Hero) clicado");
+  window.open("https://www.even3.com.br/devmind-571467/", "_blank");
 };
 
 const handleVerDetalhesClick = () => {
