@@ -1,6 +1,7 @@
 import express, { Express, Request, Response } from "express";
 import dotenv from "dotenv";
 import cors from 'cors'; // ✅ Importa o middleware CORS
+import path from "path";
 
 dotenv.config();
 
@@ -16,14 +17,18 @@ export class Api {
   public static build() {
     const app = express();
 
-    // ✅ Adiciona o middleware CORS ANTES de tudo
+    
+    // permitir duas origens:
     app.use(cors({
-      origin: 'http://localhost:5173', // 👉 Permite requisições vindas do front-end (Vite)
-      credentials: true, // 👉 Permite envio de cookies e headers personalizados
+      origin: ["http://localhost:5500", "http://127.0.0.1:5500"]
     }));
 
     app.use(express.json()); // Middleware para ler JSON
 
+    app.use(
+      "/uploads",
+      express.static(path.resolve(__dirname, "../../uploads"))
+    );
     return new Api(app);
   }
 

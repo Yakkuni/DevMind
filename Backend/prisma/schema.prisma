@@ -69,4 +69,17 @@ model Foto {
   caminho   String
 }
 
+// prisma/schema.prisma
+
+model Image {
+  id           String      @id
+  filename     String   // nome do arquivo físico gerado (ex: "1623456789012_avatar.jpg")
+  originalName String   // nome original que o admin enviou (ex: "avatar.jpg")
+  mimeType     String   // ex: "image/jpeg"
+  size         Int      // tamanho em bytes
+  url          String   // URL pública (ex: "/uploads/1623456789012_avatar.jpg" ou URL S3)
+  createdAt    DateTime @default(now())
+
+  @@map("images")
+}
 
