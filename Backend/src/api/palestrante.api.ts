@@ -31,6 +31,6 @@ export class PalestranteApi {
         this.api.addRota("/palestrante/previews", "GET", [], this.controller.listarPreviews.bind(this.controller)); // Rota GET não protegida
         this.api.addRota("/palestrante", "GET", [], this.controller.listarTodos.bind(this.controller)); // Rota GET não protegida
         this.api.addRota("/palestrante/:id", "GET", [], this.controller.buscarPorId.bind(this.controller)); // Rota GET não protegida
-        this.api.addRota("/palestrante/count", "GET", [autenticarRequisicao], this.controller.countPalestrantes.bind(this.controller))
+        this.api.addRota("/count/palestrante/", "GET", [autenticarRequisicao], this.controller.countPalestrantes.bind(this.controller))
     }
 }
