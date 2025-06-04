@@ -27,6 +27,6 @@ export class CronogramaApi {
         this.api.addRota("/cronograma", "GET", [], this.controller.getAll.bind(this.controller)); // Listar cronogramas
         this.api.addRota("/cronograma/:id", "GET", [], this.controller.getById.bind(this.controller)); // Buscar cronograma por ID
         this.api.addRota("/cronograma/dia/:data", "GET", [], this.controller.getByDia.bind(this.controller)); // Buscar cronograma por data
-        this.api.addRota("/cronograma/count", "GET", [autenticarRequisicao], this.controller.count.bind(this.controller))
+        this.api.addRota("count/cronograma/", "GET", [autenticarRequisicao], this.controller.count.bind(this.controller))
     }
 }
