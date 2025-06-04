@@ -1,11 +1,41 @@
+// src/styles/_variables.scss
 
-$principal: #2C2966;
-$complemento: #131047;
-$complementoCLaro: #6C6C94;
-$destaque: #FFA051;
+// Cores do Tema Principal (DevMind)
+$principal: #2C2966;        // Roxo/Azul escuro principal
+$complemento: #131047;     // Roxo/Azul muito escuro, para fundos profundos
+$complementoCLaro: #6C6C94; // Roxo/Azul acinzentado claro, para textos secundários ou fundos sutis
+$destaque: #FFA051;         // Laranja/Âmbar para CTAs e destaques
+
+// Neutros
 $branco: #ffffff;
 $preto: #000000;
-$cinza-texto: #333333;
+
+// Cores de Utilidade
+$cinza-fundo-pagina: #f4f6f8;  // Cinza bem claro para fundos de página (ex: painel admin)
+$cinza-borda: #dee2e6;          // Cinza padrão para bordas
+$texto-primario: #2d3748;       // Cinza escuro para texto principal sobre fundos claros
+$texto-secundario: #5a667a;    // Cinza médio para texto secundário (ajustado de $complementoCLaro para melhor contraste geral)
+
+// Cores de Status/Feedback
+$cor-sucesso: #198754;         // Verde
+$cor-erro: #dc3545;           // Vermelho
+$cor-aviso: #ffc107;          // Amarelo
+$cor-info: #0dcaf0;           // Azul claro
+
+// Breakpoints Responsivos
+$breakpoint-xs: 480px;
+$breakpoint-sm: 576px;
+$breakpoint-md: 768px;        // Principal para tablet/mobile que temos usado
+$breakpoint-lg: 992px;
+$breakpoint-xl: 1200px;
+
+// Fontes
+$font-family-principal: 'Montserrat', sans-serif;
+
+// Outras variáveis de UI
+$border-radius-base: 6px;
+$border-radius-large: 10px;
+$box-shadow-base: 0 4px 12px rgba($preto, 0.08);
 
 * {
     font-family: 'Montserrat', sans-serif;

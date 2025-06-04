@@ -1,5 +1,7 @@
 <template>
   <div class="speakers-carousel-section">
+    <h2 class="section-title">Nossos Palestrantes</h2>
+
     <div class="carousel-container">
       <button class="nav-button prev" @click="prevSlide" aria-label="Slide anterior">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
@@ -29,11 +31,17 @@
             <div class="name">{{ sp.nome }}</div>
             <div class="description">{{ sp.descricao }}</div>
             <div class="social-links" v-if="hasSocialLinks(sp.redes)">
-                <a v-if="sp.redes.instagram" :href="sp.redes.instagram" target="_blank" rel="noopener noreferrer" :aria-label="`Instagram de ${sp.nome}`">
-                    <svg viewBox="0 0 24 24"><path d="M7.8,2H16.2C19.4,2 22,4.6 22,7.8V16.2A5.8,5.8 0 0,1 16.2,22H7.8C4.6,22 2,19.4 2,16.2V7.8A5.8,5.8 0 0,1 7.8,2M7.6,4A3.6,3.6 0 0,0 4,7.6V16.4C4,18.39 5.61,20 7.6,20H16.4A3.6,3.6 0 0,0 20,16.4V7.6C20,5.61 18.39,4 16.4,4H7.6M17.25,5.5A1.25,1.25 0 0,1 18.5,6.75A1.25,1.25 0 0,1 17.25,8A1.25,1.25 0 0,1 16,6.75A1.25,1.25 0 0,1 17.25,5.5M12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9Z" /></svg>
-                </a>
-                <a v-if="sp.redes.linkedin" :href="sp.redes.linkedin" target="_blank" rel="noopener noreferrer" :aria-label="`LinkedIn de ${sp.nome}`">
-                    <svg viewBox="0 0 24 24"><path d="M19,3A2,2 0 0,1 21,5V19A2,2 0 0,1 19,21H5A2,2 0 0,1 3,19V5A2,2 0 0,1 5,3H19M18.5,18.5V13.2A3.26,3.26 0 0,0 15.24,9.94C14.39,9.94 13.4,10.46 12.92,11.24V10.13H10.13V18.5H12.92V13.5A1.92,1.92 0 0,1 14.84,11.58C15.82,11.58 16.76,12.42 16.76,13.72V18.5H18.5M6.88,8.56A1.68,1.68 0 0,0 8.56,6.88C8.56,5.92 7.81,5.19 6.88,5.19A1.69,1.69 0 0,0 5.19,6.88C5.19,7.81 5.92,8.56 6.88,8.56M8.27,18.5V10.13H5.5V18.5H8.27Z" /></svg>
+              <a v-if="sp.redes.instagram" :href="sp.redes.instagram" target="_blank" rel="noopener noreferrer" :aria-label="`Instagram de ${sp.nome}`" title="Instagram">
+                <svg viewBox="0 0 24 24"><path d="M7.8,2H16.2C19.4,2 22,4.6 22,7.8V16.2A5.8,5.8 0 0,1 16.2,22H7.8C4.6,22 2,19.4 2,16.2V7.8A5.8,5.8 0 0,1 7.8,2M7.6,4A3.6,3.6 0 0,0 4,7.6V16.4C4,18.39 5.61,20 7.6,20H16.4A3.6,3.6 0 0,0 20,16.4V7.6C20,5.61 18.39,4 16.4,4H7.6M17.25,5.5A1.25,1.25 0 0,1 18.5,6.75A1.25,1.25 0 0,1 17.25,8A1.25,1.25 0 0,1 16,6.75A1.25,1.25 0 0,1 17.25,5.5M12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9Z" /></svg>
+              </a>
+              <a v-if="sp.redes.linkedin" :href="sp.redes.linkedin" target="_blank" rel="noopener noreferrer" :aria-label="`LinkedIn de ${sp.nome}`" title="LinkedIn">
+                <svg viewBox="0 0 24 24"><path d="M19,3A2,2 0 0,1 21,5V19A2,2 0 0,1 19,21H5A2,2 0 0,1 3,19V5A2,2 0 0,1 5,3H19M18.5,18.5V13.2A3.26,3.26 0 0,0 15.24,9.94C14.39,9.94 13.4,10.46 12.92,11.24V10.13H10.13V18.5H12.92V13.5A1.92,1.92 0 0,1 14.84,11.58C15.82,11.58 16.76,12.42 16.76,13.72V18.5H18.5M6.88,8.56A1.68,1.68 0 0,0 8.56,6.88C8.56,5.92 7.81,5.19 6.88,5.19A1.69,1.69 0 0,0 5.19,6.88C5.19,7.81 5.92,8.56 6.88,8.56M8.27,18.5V10.13H5.5V18.5H8.27Z" /></svg>
+              </a>
+              <a v-if="sp.redes.youtube" :href="sp.redes.youtube" target="_blank" rel="noopener noreferrer" :aria-label="`YouTube de ${sp.nome}`" title="YouTube">
+                <svg viewBox="0 0 24 24"><path d="M10,15L15.19,12L10,9V15M21.56,7.17C21.69,7.64 21.78,8.27 21.84,9.08C21.91,9.81 21.94,10.56 21.94,11.31C21.94,12.06 21.91,12.81 21.84,13.54C21.78,14.35 21.69,14.96 21.56,15.44C21.31,16.7 20.53,17.67 19.31,18.06C18.16,18.42 16.54,18.5 12,18.5C7.46,18.5 5.84,18.42 4.69,18.06C3.47,17.67 2.69,16.7 2.44,15.44C2.31,14.96 2.22,14.35 2.16,13.54C2.09,12.81 2.06,12.06 2.06,11.31C2.06,10.56 2.09,9.81 2.16,9.08C2.22,8.27 2.31,7.64 2.44,7.17C2.69,5.9 3.47,4.93 4.69,4.54C5.84,4.18 7.46,4.1 12,4.1C16.54,4.1 18.16,4.18 19.31,4.54C20.53,4.93 21.31,5.9 21.56,7.17Z" /></svg>
+              </a>
+              <a v-if="sp.redes.site" :href="sp.redes.site" target="_blank" rel="noopener noreferrer" :aria-label="`Site de ${sp.nome}`" title="Site Pessoal">
+                <svg viewBox="0 0 24 24"><path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M11,16.9L7.2,14.61L8.8,13.39L11,14.93L16.26,10.33L17.4,11.33L11,16.9Z" /></svg> 
                 </a>
             </div>
           </div>
@@ -50,6 +58,7 @@
 </template>
 
 <script setup lang="ts">
+// O SCRIPT PERMANECE O MESMO DA VERSÃO ANTERIOR
 import { ref, onMounted, onBeforeUnmount, computed } from 'vue';
 import axios from 'axios';
 
@@ -87,23 +96,19 @@ const hasSocialLinks = (redes: SocialLinks) => {
 };
 
 async function fetchSpeakers() {
-  console.log('Disparando fetchSpeakers...'); // Log inicial
+  console.log('Disparando fetchSpeakers...');
   try {
-    const res = await axios.get<Speaker[]>('/palestrante'); // Ou a URL completa se não usar proxy
-    console.log('Resposta da API em fetchSpeakers:', res); // Veja o objeto de resposta completo
-    console.log('Dados recebidos (res.data):', res.data); // Veja os dados específicos
-    console.log('É res.data um array?:', Array.isArray(res.data));
-
-    if (Array.isArray(res.data)) {
-      speakers.value = res.data;
-    } else {
-      console.warn('API /palestrante não retornou um array. Definindo speakers como vazio.');
-      speakers.value = [];
+    const res = await axios.get<Speaker[]>('/palestrante');
+    speakers.value = Array.isArray(res.data) ? res.data : [];
+    if (!Array.isArray(res.data)) {
+         console.warn('Formato inesperado da resposta da API de palestrantes:', res.data);
     }
-    // ... resto da função (resetCarouselVisualState, etc.) ...
+    if (speakers.value.length > 0) {
+      resetCarouselVisualState();
+    }
   } catch (err) {
-    console.error('Erro detalhado em fetchSpeakers:', err); // Log completo do erro
-    speakers.value = []; // Garante que, em caso de erro, a lista fique vazia
+    console.error('Erro detalhado em fetchSpeakers:', err);
+    speakers.value = [];
   } 
 }
 
@@ -189,8 +194,6 @@ onBeforeUnmount(() => {
   clearInterval(interval.value);
   window.removeEventListener('speakersUpdated', handleSpeakersUpdate);
 });
-
-
 </script>
 
 <style scoped lang="scss">
@@ -202,28 +205,44 @@ $destaque: #FFA051;
 $branco: #ffffff;
 $preto: #000000;
 $cinza-borda-suave: #e0e0e0;
-$cinza-texto-claro: #757575;
 
 .speakers-carousel-section {
-  padding: 3rem 0;
+  padding: 4rem 1rem;
+  text-align: center; 
+}
+
+.section-title {
+  display: inline-block; 
+  position: relative;
+  font-size: clamp(2.2rem, 5vw, 3rem); 
+  color: $branco; 
+  font-weight: 700;
+  margin-bottom: 3rem; 
+  padding-bottom: 0.8rem; 
+  letter-spacing: -0.5px;
+  text-shadow: 0 2px 4px rgba($preto, 0.25); 
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%); 
+    width: 90px; 
+    height: 4px;  
+    background-color: $destaque; 
+    border-radius: 2px;
+  }
 }
 
 .carousel-container {
   position: relative;
   overflow: hidden;
   max-width: 1200px;
-  width: 90%;
+  width: 90%; 
   margin: 0 auto;
-  // --- ADICIONADO PADDING VERTICAL AQUI ---
-  // Este padding dá espaço para o translateY(-8px) e para a expansão da sombra do card no hover.
-  // Ajuste o valor (ex: 20px) conforme o tamanho do seu efeito de hover.
-  // Se a sombra for grande, pode precisar de um pouco mais.
-  padding-top: 20px;
-  padding-bottom: 20px;
-  // O padding horizontal (se necessário para as setas) pode ser adicionado aqui também,
-  // ou as setas podem ser ajustadas para ficarem mais para dentro.
-  // Exemplo: padding-left: 50px; padding-right: 50px; se as setas tiverem 48px de largura.
-  // Por agora, focamos no vertical para o hover do card.
+  padding-top: 20px;    
+  padding-bottom: 20px; 
 }
 
 .carousel-track {
@@ -232,15 +251,11 @@ $cinza-texto-claro: #757575;
 
 .carousel-item {
   flex: 0 0 100%;
-  // Adicionar um pouco de padding vertical aqui também pode ajudar a garantir
-  // que a sombra não seja cortada pelo item vizinho ou pelo track se eles tiverem alturas fixas.
-  // No entanto, com align-items: stretch, os itens devem ter a altura do track.
-  // O padding no .carousel-container é o mais importante para o overflow:hidden.
-  padding: 0 0.75rem; // Mantém o espaçamento horizontal entre os cards
+  padding: 0 0.75rem; 
   box-sizing: border-box;
   display: flex;
   justify-content: center;
-  align-items: stretch;
+  align-items: stretch; 
 
   @media (min-width: 769px) {
     flex: 0 0 calc(100% / 3);
@@ -265,11 +280,10 @@ $cinza-texto-claro: #757575;
   border: 1px solid $cinza-borda-suave;
 
   &:hover {
-    transform: translateY(-8px); // Este movimento para cima precisa de espaço no container pai
+    transform: translateY(-8px); 
     box-shadow: 0 12px 35px rgba($complemento, 0.12), 0 6px 15px rgba($complemento, 0.08);
   }
 
-  // ... (resto do estilo do .speaker-card como estava, pois é bom) ...
   .label {
     display: inline-block;
     background-color: $destaque;
@@ -325,19 +339,21 @@ $cinza-texto-claro: #757575;
     padding-top: 0.75rem;
     display: flex;
     justify-content: center;
-    gap: 1rem;
+    gap: 1rem; // Espaçamento entre ícones
 
     a {
-      color: $complementoCLaro;
+      color: $complementoCLaro; // Cor padrão do ícone
       transition: color 0.3s ease, transform 0.2s ease;
+      line-height: 0; // Para alinhar SVGs se eles tiverem espaço extra
+
       &:hover {
-        color: $destaque;
+        color: $destaque; // Cor do ícone no hover
         transform: translateY(-2px);
       }
       svg {
-        width: 22px;
+        width: 22px; // Tamanho do SVG
         height: 22px;
-        fill: currentColor;
+        fill: currentColor; // Faz o SVG herdar a cor do 'a'
       }
     }
   }
