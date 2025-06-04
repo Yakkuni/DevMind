@@ -9,12 +9,11 @@ export class ImageController {
     
     public async upload(req: Request, res: Response) {
         try {
-        // Multer coloca o arquivo em req.file
         if (!req.file) {
             return res.status(400).json({ message: "Nenhum arquivo enviado." });
         }
-
-        const created = await this.service.uploadAndCreate(req.file);
+        const usuarioId = ((req as any).usuario.id) as string;
+        const created = await this.service.uploadAndCreate(req.file, usuarioId);
         // Retorna JSON da imagem criada
             return res.status(201).json(created.toJSON());
         } catch (error) {
@@ -42,8 +41,8 @@ export class ImageController {
     public async delete(req: Request, res: Response) {
         try {
         const id = String(req.params.id);
-
-        await this.service.deleteById(id);
+        const usuarioId = ((req as any).usuario.id) as string;
+        await this.service.deleteById(id, usuarioId);
         return res.status(204).end();
         } catch (error) {
         console.error("Erro ao deletar imagem:", (error as Error).message);

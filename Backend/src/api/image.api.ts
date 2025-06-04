@@ -31,6 +31,6 @@ export class ImageApi {
         // Rota para deletar (apenas admins)
         this.api.addRota("/images/:id", "DELETE", [autenticarRequisicao], this.controller.delete.bind(this.controller));
 
-        this.api.addRota("/count/images", "GET", [], this.controller.count.bind(this.controller))
+        this.api.addRota("/count/images", "GET", [autenticarRequisicao], this.controller.count.bind(this.controller))
     }
 }   

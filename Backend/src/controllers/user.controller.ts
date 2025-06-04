@@ -74,10 +74,10 @@ export class UserController {
 
     public async history(req: Request, res: Response) {
         try {
-        const historico = this.historicoService.getAllHistoricos()
-        res.status(200).json(historico)
+            const historico = await this.historicoService.getAllHistoricos()
+            res.status(200).json(historico)
         } catch (error) {
-        res.status(401).json({message:"Erro ao exibir histórico"})
+            res.status(401).json({message:"Erro ao exibir histórico"})
         }
     }
 
