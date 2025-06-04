@@ -1,6 +1,7 @@
 <template>
   <div class="admin-resource-dashboard historico-page">
-    <header class="dashboard-header"> <div class="header-content-alt"> <button @click="voltarParaDashboard" class="btn btn-back" aria-label="Voltar para o Dashboard" v-if="showBackButton">
+    <header class="dashboard-header"> <div class="header-content-alt">
+        <button @click="voltarParaDashboard" class="btn btn-back" aria-label="Voltar para o Dashboard" v-if="showBackButton">
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
           Voltar
         </button>
@@ -8,12 +9,15 @@
       </div>
       </header>
 
-    <div v-if="mensagemErro" class="alert alert-danger">{{ mensagemErro }}</div>
+    <div v-if="mensagemErro" class="alert alert-danger">
+      <p>{{ mensagemErro }}</p>
+      <button @click="fetchLogEntries(1)" class="btn btn-sm btn-retry-alert">Tentar Novamente</button>
+    </div>
 
     <div class="card list-card">
       <div class="table-controls" v-if="!isLoading && logEntries.length > 0">
         <div class="pagination-info">
-          Exibindo {{ (currentPage - 1) * itemsPerPage + 1 }} - {{ Math.min(currentPage * itemsPerPage, totalEntries) }} de {{ totalEntries }} registros
+          Exibindo {{ Math.min((currentPage - 1) * itemsPerPage + 1, totalEntries) }} - {{ Math.min(currentPage * itemsPerPage, totalEntries) }} de {{ totalEntries }} registros
         </div>
         </div>
 
@@ -67,8 +71,8 @@
 
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue';
-import { useRouter } from 'vue-router'; // Importar o useRouter
-import api from '../../services/api';
+import { useRouter } from 'vue-router';
+import api from '../../services/api'; // Sua instância Axios configurada
 
 interface LogEntry {
   id: string | number;
@@ -82,39 +86,62 @@ interface LogEntry {
   ip?: string | null;
 }
 
-const router = useRouter(); // Instanciar o router
+const router = useRouter();
 const logEntries = ref<LogEntry[]>([]);
-const isLoading = ref(true); // Iniciar como true para carregar ao montar
+const isLoading = ref(true);
 const mensagemErro = ref<string | null>(null);
 const currentPage = ref(1);
-const itemsPerPage = ref(15);
+const itemsPerPage = ref(15); // Ou o valor que seu backend usa como padrão/máximo
 const totalEntries = ref(0);
 
-// Para controlar a visibilidade do botão Voltar (opcional, pode sempre mostrar)
-const showBackButton = computed(() => router.options.history.state.back !== null);
+const showBackButton = computed(() => {
+  // Verifica se há um histórico de navegação para exibir o botão "Voltar"
+  // Isso pode ser mais complexo dependendo da sua lógica de navegação global
+  return window.history.length > 1 && router.options.history.state.back;
+});
 
 const fetchLogEntries = async (page: number = 1) => {
   isLoading.value = true;
   mensagemErro.value = null;
   try {
+    console.log(`Buscando histórico para a página: ${page}`);
+    // Certifique-se que '/admin/historico' é o caminho correto no seu backend
+    // e que sua instância 'api' do Axios está configurada com baseURL ou proxy.
     const response = await api.get<{ data: LogEntry[], total: number }>('/admin/historico', {
       params: {
         page: page,
         limit: itemsPerPage.value,
-        sortBy: 'timestamp',
+        sortBy: 'timestamp', // Ordenar pelos mais recentes primeiro
         order: 'desc'
       }
     });
-    if (response.data && Array.isArray(response.data.data)) {
+
+    console.log("Resposta da API /admin/historico:", response.data);
+
+    if (response.data && Array.isArray(response.data.data) && typeof response.data.total === 'number') {
       logEntries.value = response.data.data;
       totalEntries.value = response.data.total;
       currentPage.value = page;
     } else {
-      throw new Error("Formato de resposta da API inválido para o histórico.");
+      console.warn("Formato de resposta da API inválido para o histórico:", response.data);
+      throw new Error("Formato de resposta da API inválido.");
     }
   } catch (err: any) {
-    console.error("Erro ao carregar histórico:", err);
-    mensagemErro.value = `Falha ao carregar histórico: ${err.response?.data?.message || err.message || 'Erro desconhecido'}`;
+    console.error("Erro detalhado ao carregar histórico:", err);
+    let specificMessage = 'Erro desconhecido ao carregar o histórico.';
+    if (err.response) {
+      specificMessage = `Falha ao carregar histórico (Status: ${err.response.status}): ${err.response.data?.message || 'Erro do servidor'}`;
+      if (err.response.status === 401 || err.response.status === 403) {
+        specificMessage = "Você não tem permissão para ver o histórico ou sua sessão expirou.";
+      } else if (err.response.status === 404) {
+        specificMessage = "Endpoint do histórico não encontrado no servidor.";
+      }
+    } else if (err.request) {
+      specificMessage = "Não foi possível conectar ao servidor para buscar o histórico. Verifique sua conexão e se o backend está rodando.";
+    } else {
+      specificMessage = err.message || specificMessage;
+    }
+    mensagemErro.value = specificMessage;
     logEntries.value = [];
     totalEntries.value = 0;
   } finally {
@@ -124,15 +151,20 @@ const fetchLogEntries = async (page: number = 1) => {
 
 const formatarTimestamp = (timestamp: string | Date): string => {
   if (!timestamp) return 'N/A';
-  const date = new Date(timestamp);
-  return date.toLocaleString('pt-BR', {
-    day: '2-digit', month: '2-digit', year: 'numeric',
-    hour: '2-digit', minute: '2-digit', second: '2-digit',
-  });
+  try {
+    const date = new Date(timestamp);
+    if (isNaN(date.getTime())) return 'Data inválida';
+    return date.toLocaleString('pt-BR', {
+      day: '2-digit', month: '2-digit', year: 'numeric',
+      hour: '2-digit', minute: '2-digit', second: '2-digit',
+    });
+  } catch (e) {
+    return 'Data inválida';
+  }
 };
 
 const getActionClass = (action: string): string => {
-  const lowerAction = String(action || '').toLowerCase(); // Garante que action é string
+  const lowerAction = String(action || '').toLowerCase();
   if (lowerAction.includes('create') || lowerAction.includes('add') || lowerAction.includes('criar')) return 'action-create';
   if (lowerAction.includes('update') || lowerAction.includes('edit') || lowerAction.includes('atualizar')) return 'action-update';
   if (lowerAction.includes('delete') || lowerAction.includes('remove') || lowerAction.includes('deletar')) return 'action-delete';
@@ -142,18 +174,19 @@ const getActionClass = (action: string): string => {
 };
 
 const totalPages = computed(() => {
-  if (totalEntries.value === 0 || itemsPerPage.value === 0) return 0;
+  if (totalEntries.value === 0 || itemsPerPage.value <= 0) return 0;
   return Math.ceil(totalEntries.value / itemsPerPage.value);
 });
 
 const irParaPagina = (pagina: number) => {
   if (pagina >= 1 && pagina <= totalPages.value && pagina !== currentPage.value) {
     fetchLogEntries(pagina);
+    window.scrollTo({ top: 0, behavior: 'smooth' }); // Rola para o topo ao mudar de página
   }
 };
 
 const voltarParaDashboard = () => {
-  router.push({ name: 'Dashboard' }); // Certifique-se que a rota 'Dashboard' existe
+  router.push({ name: 'Dashboard' }); // Certifique-se que esta rota está nomeada como 'Dashboard'
 };
 
 onMounted(() => {
@@ -169,7 +202,7 @@ $complementoCLaro: #6C6C94;
 $destaque: #FFA051;
 $branco: #ffffff;
 $preto: #000000;
-$cinza-borda: #ccd1d9; // Ajustado para consistência
+$cinza-borda: #ccd1d9;
 $cinza-fundo-pagina: #f4f6f8;
 $cor-sucesso: #198754; 
 $cor-aviso: #ffc107; 
@@ -184,10 +217,9 @@ $texto-secundario: #4a5568;
   min-height: calc(100vh - 60px); 
 }
 
-// Header da página (similar ao de Palestrantes e Cronograma Admin)
 .dashboard-header {
   display: flex;
-  justify-content: space-between;
+  justify-content: space-between; 
   align-items: center;
   margin-bottom: 2.5rem;
   padding: 1.25rem 1.5rem;
@@ -196,7 +228,7 @@ $texto-secundario: #4a5568;
   border-radius: 8px;
   box-shadow: 0 4px 15px rgba($preto, 0.1);
 
-  .header-content-alt { // Wrapper para o botão voltar e título
+  .header-content-alt {
     display: flex;
     align-items: center;
     gap: 1rem;
@@ -209,7 +241,7 @@ $texto-secundario: #4a5568;
     margin: 0;
   }
 }
-.btn-back { // Estilo do botão voltar, igual ao de PalestrantesDashboard
+.btn-back {
   background-color: rgba($branco, 0.1);
   color: $branco;
   border: 1px solid rgba($branco, 0.3);
@@ -228,7 +260,6 @@ $texto-secundario: #4a5568;
   }
 }
 
-
 .card { 
   background-color: $branco;
   border-radius: 10px; 
@@ -238,14 +269,26 @@ $texto-secundario: #4a5568;
   border: 1px solid $cinza-borda;
 }
 
-.list-card {
-  // Estilos específicos para o card que contém a lista/tabela, se necessário
-}
-
 .alert {
   padding: 0.9rem 1.25rem; margin-bottom: 1.5rem; border-radius: 8px; font-size: 0.9rem;
   border-width: 1px; border-style: solid;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
   &.alert-danger { background-color: lighten($cor-erro, 35%); border-color: darken($cor-erro,5%); color: darken($cor-erro, 25%); }
+  .btn-retry-alert {
+    padding: 0.3rem 0.8rem;
+    font-size: 0.8rem;
+    margin-left: 1rem;
+    background-color: $cor-erro;
+    color: $branco;
+    border: 1px solid darken($cor-erro, 10%);
+    border-radius: 4px;
+    &:hover {
+        background-color: darken($cor-erro, 10%);
+    }
+  }
 }
 
 .loading-state, .empty-state { 
@@ -293,32 +336,33 @@ $texto-secundario: #4a5568;
     font-family: monospace; 
     font-size: 0.85rem;
     color: $complementoCLaro;
+    word-break: break-all; // Para IDs longos quebrarem
   }
 
   .details-cell {
-    max-width: 380px; // Um pouco mais de espaço
+    max-width: 380px; 
     white-space: pre-wrap;
     word-break: break-word;
-    font-size: 0.875rem; // Texto dos detalhes um pouco maior
+    font-size: 0.875rem; 
     color: $texto-secundario;
     pre {
       background-color: $cinza-fundo-pagina; 
-      padding: 0.75rem; // Mais padding
-      border-radius: 6px; // Borda mais suave
+      padding: 0.75rem; 
+      border-radius: 6px; 
       max-height: 150px; 
       overflow-y: auto;
       border: 1px solid $cinza-borda;
-      font-size: 0.8rem; // Fonte menor para o JSON
+      font-size: 0.8rem; 
       line-height: 1.4;
     }
   }
 }
 
 .action-badge {
-  padding: 0.35em 0.75em; // Padding ajustado
+  padding: 0.35em 0.75em; 
   border-radius: 4px; 
-  font-size: 0.8em; // Badge um pouco maior
-  font-weight: 600; // Menos "bold" que 700 para melhor leitura
+  font-size: 0.8em; 
+  font-weight: 600; 
   color: $branco;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -333,13 +377,15 @@ $texto-secundario: #4a5568;
   &.action-other  { background-color: lighten($complementoCLaro, 15%); color: $complemento; }
 }
 
-.table-controls, .pagination-controls {
+.table-controls { // Container para info de paginação e filtros
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem 0; 
+  padding: 0.5rem 0 1rem 0; // Adicionado padding abaixo
   flex-wrap: wrap;
   gap: 1rem;
+  border-bottom: 1px solid $cinza-borda; // Separador antes da tabela
+  margin-bottom: 1rem; // Espaço antes da tabela
 }
 
 .pagination-info {
@@ -348,14 +394,19 @@ $texto-secundario: #4a5568;
 }
 
 .pagination-controls {
-  margin-top: 1.5rem; // Mais espaço para a paginação
-  .btn { 
-    padding: 0.5rem 0.9rem; // Botões de paginação um pouco menores
+  margin-top: 1.5rem; 
+  display: flex;
+  justify-content: center; // Centraliza os controles de paginação
+  align-items: center;
+  gap: 0.5rem; // Gap entre os botões e o texto
+
+  .btn.btn-outline { // Estilo específico para botões de paginação
+    padding: 0.5rem 0.9rem; 
     font-size: 0.8rem;
-    font-weight: 500; // Peso ajustado
+    font-weight: 500; 
     background-color: $branco;
     color: $principal;
-    border: 1px solid $cinza-borda; // Borda padrão mais sutil
+    border: 1px solid $cinza-borda; 
     border-radius: 6px;
     transition: all 0.2s ease;
 
@@ -365,31 +416,25 @@ $texto-secundario: #4a5568;
       color: $principal;
       transform: translateY(-1px);
     }
-    &.active, &:focus { // Estilo para indicar foco ou página atual se fosse o caso
-        // background-color: $principal;
-        // color: $branco;
-        // border-color: $principal;
-    }
     &:disabled {
       color: lighten($complementoCLaro, 10%);
       border-color: $cinza-borda;
       background-color: $cinza-fundo-pagina;
     }
   }
-  span {
-    margin: 0 0.75rem; 
+  span { // "Página X de Y"
+    margin: 0 0.5rem; 
     font-size: 0.9rem;
     color: $complemento;
     font-weight: 500;
   }
 }
 
-// Responsividade da tabela (mantida e ajustada para legibilidade)
 @media (max-width: 768px) {
   .historico-page { padding: 1rem; }
   .dashboard-header {
     flex-direction: column; align-items: stretch; gap: 1rem;
-    .header-content-alt { justify-content: center; } // Centraliza conteúdo do header
+    .header-content-alt { justify-content: center; } 
     h1 { font-size: 1.6rem; text-align: center; }
   }
   .card { padding: 1.5rem; }
@@ -400,10 +445,10 @@ $texto-secundario: #4a5568;
     tr { display: block; margin-bottom: 1rem; border: 1px solid $cinza-borda; border-radius: 8px; box-shadow: 0 2px 6px rgba($preto,0.05); padding: 0.8rem; }
     td { 
       display: grid;
-      grid-template-columns: 100px 1fr; // Label | Valor
-      align-items: center; // Alinha verticalmente
-      text-align: left; // Valor alinhado à esquerda
-      padding: 0.7rem 0; // Padding vertical
+      grid-template-columns: 90px 1fr; // Label com largura um pouco menor
+      align-items: center; 
+      text-align: left; 
+      padding: 0.7rem 0; 
       border-bottom: 1px dotted lighten($cinza-borda, 8%);
       font-size: 0.9rem; 
 
@@ -413,13 +458,13 @@ $texto-secundario: #4a5568;
         color: $principal;
         padding-right: 0.5rem;
         white-space: nowrap;
-        font-size: 0.85rem; 
+        font-size: 0.8rem; // Label um pouco menor
       }
       &:last-child { border-bottom: none; padding-bottom: 0; }
       
-      & > * { // Conteúdo da célula (span, pre)
+      & > * { 
          justify-self: start; 
-         max-width: 100%; // Para o <pre> não estourar
+         max-width: 100%; 
       }
       &.actions-cell { 
         grid-template-columns: 1fr; 
@@ -428,19 +473,22 @@ $texto-secundario: #4a5568;
         &::before { display: none;} 
       }
       &.details-cell {
-        grid-template-columns: 1fr; // Permite que <pre> ocupe a largura
+        grid-template-columns: 1fr; 
         &::before { display: block; margin-bottom: 0.3rem; grid-column: 1 / -1;}
         pre, span { grid-column: 1 / -1; }
       }
-       &.entity-id { // Garante que o ID não seja cortado demais
+       &.entity-id { 
         word-break: break-all;
       }
     }
   }
-  .table-controls, .pagination-controls {
-    flex-direction: column; align-items: stretch;
-    .btn { width: 100%; margin-bottom: 0.5rem; &:last-child{ margin-bottom:0; } }
+  .table-controls {
+    justify-content: center; // Centraliza info de paginação em mobile
     .pagination-info { margin-bottom: 0.5rem; text-align:center; width:100%;}
+  }
+  .pagination-controls {
+    flex-direction: column; align-items: stretch;
+    .btn { width: 100%; margin: 0.25rem 0; } // Botões empilhados
   }
 }
 </style>

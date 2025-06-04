@@ -172,7 +172,7 @@ const carregarDados = async () => {
     ] = await Promise.all([
       api.get('/auth/me'),                  // Para dados do usuário logado
       api.get<ListItem[]>('/user'),    // Lista de administradores
-      api.get<ListItem[]>('/count/palestrante'), // Contagem de palestrantes
+      api.get<ListItem[]>('/palestrante'), // Contagem de palestrantes
       api.get<ListItem[]>('/cronograma')  // Lista de atividades do cronograma
     ]);
     
