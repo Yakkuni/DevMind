@@ -1,8 +1,9 @@
 import { Request, Response } from "express";
 import { UserService } from "../services/user.service";
+import { HistoricoService } from "../services/historico.service";
 
 export class UserController {
-    constructor(private readonly service: UserService) {}
+    constructor(private readonly service: UserService, private readonly historicoService: HistoricoService) {}
 
     public async getAllUsers(req: Request, res: Response) {
         try {
@@ -68,6 +69,15 @@ export class UserController {
         res.status(200).json({ count });
         } catch (error) {
         res.status(500).json({ message: "Erro ao contar usuários por cargo." });
+        }
+    }
+
+    public async history(req: Request, res: Response) {
+        try {
+        const historico = this.historicoService.getAllHistoricos()
+        res.status(200).json(historico)
+        } catch (error) {
+        res.status(401).json({message:"Erro ao exibir histórico"})
         }
     }
 

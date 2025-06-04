@@ -1,6 +1,7 @@
 // controllers/auth.controller.ts
 import { Request, Response } from "express";
 import { AuthService } from "../services/auth.service";
+import { HistoricoService } from "../services/historico.service";
 
 export class AuthController {
   constructor(private readonly service: AuthService) {}
@@ -34,6 +35,8 @@ export class AuthController {
   } catch (error) {
     res.status(401).json({ message: "Não autenticado" });
   }
+
+  
 }
 
   

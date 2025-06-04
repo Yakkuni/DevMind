@@ -3,13 +3,19 @@ import { UserController } from "../controllers/user.controller";
 import { UserService } from "../services/user.service";
 import { UsuarioDao } from "../dao/usuario.dao";
 import { autenticarRequisicao, autenticarAdmin } from "../utils/auth.middleware"; // Importando o middleware
+import { HistoricoDao } from "../dao/historico.dao";
+import { HistoricoService } from "../services/historico.service";
 export class UserApi {
   private constructor(private readonly api: Api) {}
 
   public static build(api: Api) {
     const dao = new UsuarioDao();
     const service = new UserService(dao);
-    const controller = new UserController(service);
+    const historicoDao = new HistoricoDao()
+
+
+    const historicoService = new HistoricoService(historicoDao, service)
+    const controller = new UserController(service, historicoService);
 
 
     api.addRota("/user", "GET", [autenticarRequisicao, autenticarAdmin], controller.getAllUsers.bind(controller)); 
@@ -19,7 +25,7 @@ export class UserApi {
 
     api.addRota("/count/users", "GET", [autenticarRequisicao, autenticarAdmin], controller.getUserCount.bind(controller));
     api.addRota("/count/users/cargo", "GET", [autenticarRequisicao, autenticarAdmin], controller.getUserCountByCargo.bind(controller))
-    //api.addRota("/history", "GET", [autenticarRequisicao, autenticarAdmin], controller.history.bind(controller));
+    api.addRota("/history", "GET", [autenticarRequisicao, autenticarAdmin], controller.history.bind(controller));
     
     }
 }
