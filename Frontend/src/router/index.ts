@@ -12,6 +12,7 @@ import DashboardPage from '../pages/ADM/DashboardPage.vue';
 import CronogramaAdminPage from '../pages/ADM/CronogramaDashboard.vue';
 // 1. Importe o componente da página de histórico (crie este arquivo se não existir)
 import HistoricoAdminPage from '../pages/ADM/HistoricoAdminPage.vue'; // Ajuste o caminho se necessário
+import PalestrantesDashboard from '../components/ADM/PalestrantesDashboard.vue';
 
 const routes = [
   // ... suas rotas públicas ...
@@ -25,7 +26,7 @@ const routes = [
     ],
   },
   {
-    path: '/DevmindADM',
+    path: '/admin',
     component: AdminLayout,
     children: [
       {
@@ -47,11 +48,17 @@ const routes = [
       },
       // 2. Adicione a nova rota para o histórico aqui
       {
-        path: 'historico', // Acessível em /DevmindADM/historico
+        path: 'historico',
         name: 'AdminHistorico',
         component: HistoricoAdminPage,
         meta: { requiresAuth: true }, // Provavelmente requer autenticação também
       },
+      {
+        path: 'palestrantes',
+        name: 'AdminPalestrantes', // O nome usado em router.push({ name: 'AdminPalestrantes' })
+        component: PalestrantesDashboard, // Ajuste o caminho!
+        meta: { requiresAuth: true }
+      }
     ],
   },
   // ... (rota NotFound comentada ou removida) ...

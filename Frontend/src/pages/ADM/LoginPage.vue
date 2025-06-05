@@ -86,7 +86,7 @@ async function handleLogin() {
 
     console.log('Usuário logado:', meResponse.data);
     // Redireciona para o dashboard ou para a rota de 'redirect' se existir
-    const redirectPath = router.currentRoute.value.query.redirect as string || '/DevMindADM/dashboard';
+    const redirectPath = router.currentRoute.value.query.redirect as string || '/admin/dashboard';
     router.push(redirectPath);
 
   } catch (error: any) {

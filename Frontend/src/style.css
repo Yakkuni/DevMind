@@ -53,6 +53,7 @@ body {
      para que seja aplicada independentemente do tema de cores. */
 }
 
+
 /* Nota sobre SCSS vs CSS:
    O código acima é CSS puro. Suas variáveis SCSS ($principal, $destaque, etc.)
    são usadas dentro dos seus componentes Vue (<style lang="scss" scoped>).

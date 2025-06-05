@@ -1,14 +1,18 @@
 import express, { Express, Request, Response } from "express";
 import dotenv from "dotenv";
-import cors from 'cors'; // ✅ Importa o middleware CORS
+import cors from "cors"; // Importa o middleware CORS
 import path from "path";
 
 dotenv.config();
 
 // Converte a PORT do .env para número e valida
-const PORT = parseInt(process.env.PORT || "", 10);
+const PORT_STRING = process.env.PORT || "3000"; // Define um fallback caso process.env.PORT seja undefined
+const PORT = parseInt(PORT_STRING, 10);
+
 if (isNaN(PORT)) {
-  throw new Error("PORT inválida. Verifique o arquivo .env e use um número, como PORT=3000");
+  // Se, mesmo após o fallback, não for um número, lança erro.
+  // Isso é improvável com o fallback "3000", mas mantém a robustez.
+  throw new Error(`PORT inválida: "${PORT_STRING}". Verifique o arquivo .env e use um número, como PORT=3000`);
 }
 
 export class Api {
@@ -17,24 +21,43 @@ export class Api {
   public static build() {
     const app = express();
 
-    
-    // permitir duas origens:
-    app.use(cors({
-      origin: ["http://localhost:5500", "http://127.0.0.1:5500"]
-    }));
+    // Configuração do CORS para permitir múltiplas origens, incluindo seu frontend Vue
+    const allowedOrigins = [
+      "http://localhost:5500",   // Sua origem existente
+      "http://127.0.0.1:5500",   // Sua origem existente
+      "http://localhost:5173"    // ✅ ADICIONADO: A origem do seu frontend Vue.js
+    ];
+
+    app.use(
+      cors({
+        origin: function (origin, callback) {
+          // Permite requisições sem 'origin' (como Postman, apps mobile, ou server-to-server)
+          // OU se a origem estiver na lista de permitidas
+          if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+            callback(null, true);
+          } else {
+            callback(new Error("Not allowed by CORS"));
+          }
+        },
+        credentials: true // Se você precisar enviar cookies ou cabeçalhos de autorização
+      })
+    );
 
     app.use(express.json()); // Middleware para ler JSON
 
-    app.use(
-      "/uploads",
-      express.static(path.resolve(__dirname, "../../uploads"))
-    );
+    app.use("/uploads", express.static(path.resolve(__dirname, "../../uploads")));
+
     return new Api(app);
   }
 
   public start() {
     this.app.listen(PORT, () => {
-      console.log("Server is running on http://localhost:" + PORT);
+      console.log(`Servidor backend rodando em http://localhost:${PORT}`);
+      console.log(
+        `Origens CORS permitidas (se definidas): ${JSON.stringify(
+          this.app.get("corsOptions")?.origin || "Verifique a configuração app.use(cors(...))"
+        )}`
+      );
     });
   }
 

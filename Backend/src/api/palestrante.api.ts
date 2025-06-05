@@ -21,7 +21,6 @@ export class PalestranteApi {
     }
 
     private addRotas() {
-        // Rota protegida (requere autenticação)
         this.api.addRota("/palestrante", "POST", [autenticarRequisicao], this.controller.criar.bind(this.controller)); // Passa o middleware como um array
         this.api.addRota("/palestrante/:id", "DELETE", [autenticarRequisicao], this.controller.remover.bind(this.controller)); // Passa o middleware como um array
         this.api.addRota("/palestrante/:id", "PUT", [autenticarRequisicao], this.controller.atualizar.bind(this.controller)); // Passa o middleware como um array
