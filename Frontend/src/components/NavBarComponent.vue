@@ -19,7 +19,7 @@
           <router-link to="/patrocinadores" class="nav-link">Patrocinadores</router-link>
         </li>
         <li class="nav-item">
-          <router-link to="/sobre-nos" class="nav-link">Sobre Nós</router-link>
+          <router-link to="/sobreNos" class="nav-link">Sobre Nós</router-link>
         </li>
       </ul>
       <button class="event-btn cta-button" @click="handleParticiparClick">Participar do Evento</button>
@@ -34,7 +34,7 @@
     <aside class="sidebar" :class="{ 'sidebar-active': isSidebarActive }">
       <div class="sidebar-header">
         <span class="sidebar-title">DevMind</span>
-        </div>
+      </div>
       <ul class="sidebar-nav">
         <li class="sidebar-item">
           <router-link to="/" class="sidebar-link" @click="closeSidebarAndNavigate('/')" exact>Início</router-link>
@@ -46,7 +46,7 @@
           <router-link to="/patrocinadores" class="sidebar-link" @click="closeSidebarAndNavigate('/patrocinadores')">Patrocinadores</router-link>
         </li>
         <li class="sidebar-item">
-          <router-link to="/sobre-nos" class="sidebar-link" @click="closeSidebarAndNavigate('/sobre-nos')">Sobre Nós</router-link>
+          <router-link to="/sobreNos" class="sidebar-link" @click="closeSidebarAndNavigate('/sobreNos')">Sobre Nós</router-link>
         </li>
         <li class="sidebar-item">
           <a href="#outras-edicoes" class="sidebar-link" @click="closeSidebarAndHandleLink('#outras-edicoes')">Outras Edições</a>
@@ -107,8 +107,6 @@ const closeSidebarAndNavigate = (path: string) => {
         toggleSidebar();
     }, 50);
   }
-  // A navegação é feita pelo <router-link>, não é necessário router.push(path) aqui
-  // a menos que path não seja uma rota e sim uma âncora na mesma página.
 };
 
 const closeSidebarAndHandleLink = (target: string, isExternal: boolean = false) => {
@@ -159,7 +157,7 @@ watch(() => route.path, () => {
 </script>
 
 <style scoped lang="scss">
-// Suas variáveis globais (assumindo que estão disponíveis globalmente ou importe-as)
+// NENHUMA ALTERAÇÃO DE ESTILO FOI FEITA AQUI
 $principal: #2C2966;
 $complemento: #131047;
 $complementoCLaro: #6C6C94;
@@ -167,7 +165,7 @@ $destaque: #FFA051;
 $branco: #ffffff;
 $preto: #000000;
 $cinza-texto: #333333;
-$breakpoint-tablet: 768px; // Ajuste este breakpoint se "Sobre Nós" não couber bem
+$breakpoint-tablet: 768px;
 
 .navbar {
   position: fixed;
@@ -178,13 +176,13 @@ $breakpoint-tablet: 768px; // Ajuste este breakpoint se "Sobre Nós" não couber
   align-items: center;
   justify-content: space-between;
   padding: 0.9rem 1.5rem;
-  background-color: transparent; // Navbar transparente por padrão
+  background-color: transparent;
   border-bottom: 1px solid transparent;
   transition: background-color 0.3s ease, transform 0.3s ease-in-out, box-shadow 0.3s ease;
   z-index: 1000;
 
   &.navbar-scrolled {
-    background-color: rgba($principal, 0.9); // Fundo translúcido ao rolar
+    background-color: rgba($principal, 0.9);
     box-shadow: 0 2px 10px rgba($preto, 0.15);
     border-bottom-color: rgba($branco, 0.1);
   }
@@ -224,7 +222,7 @@ $breakpoint-tablet: 768px; // Ajuste este breakpoint se "Sobre Nós" não couber
 .navbar-menu {
   display: flex;
   align-items: center;
-  @media (max-width: $breakpoint-tablet) { // O menu desktop some em telas menores
+  @media (max-width: $breakpoint-tablet) {
     display: none;
   }
 }
@@ -251,38 +249,27 @@ $breakpoint-tablet: 768px; // Ajuste este breakpoint se "Sobre Nós" não couber
     position: absolute;
     width: 0;
     height: 2px;
-    bottom: -2px; // Posição da linha de destaque
+    bottom: -2px;
     left: 50%;
     transform: translateX(-50%);
     background-color: $destaque;
     transition: width 0.3s ease;
   }
 
-  &:hover { // Estilo de hover para todos os links
+  &:hover {
     color: $destaque;
-    &::after { // Linha aparece no hover
+    &::after {
       width: 100%;
     }
   }
 
-  // Estilo para o link EXATAMENTE ativo
   &.router-link-exact-active {
     color: $destaque;
-    font-weight: 700; // Pode deixar mais forte o texto do link ativo
+    font-weight: 700;
     &::after {
-      width: 100%; // Linha completa
+      width: 100%;
     }
   }
-  // Se você quiser um estilo para links "pai" ativos (ex: /shop ativo quando em /shop/product)
-  // descomente e ajuste o bloco abaixo. Para "destaque somente a página onde estou", ele não é necessário.
-  /*
-  &.router-link-active:not(.router-link-exact-active) {
-    color: lighten($destaque, 15%);
-    &::after {
-      width: 60%;
-    }
-  }
-  */
 }
 
 .cta-button {
@@ -352,10 +339,9 @@ $breakpoint-tablet: 768px; // Ajuste este breakpoint se "Sobre Nós" não couber
   .hamburger-inner::before { top: -9px; }
   .hamburger-inner::after { bottom: -9px; }
 
-  // Animação para 'X' quando sidebar está ativa
   &.is-active .hamburger-inner {
     transform: rotate(45deg);
-    background-color: $principal; // Cor do X para contrastar com sidebar clara
+    background-color: $principal;
   }
   &.is-active .hamburger-inner::before {
     top: 0;
@@ -364,7 +350,7 @@ $breakpoint-tablet: 768px; // Ajuste este breakpoint se "Sobre Nós" não couber
   }
   &.is-active .hamburger-inner::after {
     bottom: 0;
-    opacity: 0; // Esconde a barra do meio para formar o X
+    opacity: 0;
   }
 
   @media (max-width: $breakpoint-tablet) {
@@ -392,7 +378,7 @@ $breakpoint-tablet: 768px; // Ajuste este breakpoint se "Sobre Nós" não couber
 
 .sidebar-header {
   display: flex;
-  justify-content: center; // Centraliza o título
+  justify-content: center;
   align-items: center;
   padding: 1.2rem 1.5rem;
   border-bottom: 1px solid #eaeaea;
@@ -434,7 +420,6 @@ $breakpoint-tablet: 768px; // Ajuste este breakpoint se "Sobre Nós" não couber
     color: $principal;
   }
 
-  // Estilo para o link EXATAMENTE ativo na sidebar
   &.router-link-exact-active {
     background-color: $principal;
     color: $branco;

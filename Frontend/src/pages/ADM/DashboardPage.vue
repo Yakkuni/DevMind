@@ -57,8 +57,12 @@
           <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11zM7 11h2v2H7v-2zm4 0h2v2h-2v-2zm4 0h2v2h-2v-2z"/></svg>
           Gerenciar Cronograma
         </button>
+        <button class="btn btn-secondary" @click="irParaGerenciarPatrocinadores">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c2.14-.46 3.5-1.78 3.5-3.85 0-2.34-1.71-3.47-4.2-4.1z"/></svg>
+            Gerenciar Patrocinadores
+        </button>
         <button class="btn btn-secondary" @click="irParaHistorico">
-           <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M13 3a9 9 0 0 0-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42A8.954 8.954 0 0 0 13 21a9 9 0 0 0 0-18zm-1 5v5l4.25 2.52.77-1.28l-3.52-2.09V8z"/></svg>
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M13 3a9 9 0 0 0-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42A8.954 8.954 0 0 0 13 21a9 9 0 0 0 0-18zm-1 5v5l4.25 2.52.77-1.28l-3.52-2.09V8z"/></svg>
           Ver Histórico
         </button>
         <button class="btn btn-outline-destaque" @click="verPaginaPrincipal">
@@ -118,6 +122,7 @@ const stats = reactive({
 });
 
 interface ListItem { id: string | number; [key: string]: any; }
+interface CountResponse { count: number; }
 
 const formTickerData = reactive({ textoData: '' });
 const isLoadingTickerConfig = ref(false);
@@ -167,61 +172,79 @@ const carregarDados = async () => {
     const [
       usuarioRes,
       adminUsersRes,
-      palestrantesRes,
+      palestrantesCountRes, // Nome da variável reflete que esperamos uma contagem
       cronogramaRes
     ] = await Promise.all([
-      api.get('/auth/me'),                  // Para dados do usuário logado
-      api.get<ListItem[]>('/user'),    // Lista de administradores
-      api.get<ListItem[]>('/palestrante'), // Contagem de palestrantes
-      api.get<ListItem[]>('/cronograma')  // Lista de atividades do cronograma
+      api.get('/auth/me'),               // Para dados do usuário logado (requer auth)
+      api.get<ListItem[]>('/user'),      // Lista de administradores (requer auth)
+      api.get<CountResponse>('/palestrante'), // Rota dedicada para contagem (requer auth)
+      api.get<ListItem[]>('/cronograma')   // Lista de atividades (não requer auth no seu exemplo de rotas)
     ]);
     
     // Processa dados do usuário logado
-    if (usuarioRes.data && typeof usuarioRes.data === 'object' && 'nome' in usuarioRes.data) {
+    if (usuarioRes.data && typeof usuarioRes.data === 'object' && usuarioRes.data !== null && 'nome' in usuarioRes.data) {
       userData.nome = usuarioRes.data.nome || 'Admin';
       userData.cargo = usuarioRes.data.cargo || 'Master';
     } else {
-      console.warn("API /me não retornou dados do usuário esperados:", usuarioRes.data);
-      userData.nome = 'Admin'; 
+       console.warn("API /me não retornou dados do usuário esperados:", usuarioRes.data);
+      userData.nome = 'Admin'; // Fallback
       userData.cargo = 'Master';
     }
 
-    // Processa contagem de Administradores
+    // Processa contagem de Administradores (da rota /user)
     console.log("Resposta de /user:", adminUsersRes.data);
     if (Array.isArray(adminUsersRes.data)) {
       stats.usuarios = adminUsersRes.data.length;
     } else {
-      console.warn("API /user não retornou um array.");
+      console.warn("API /user não retornou um array. Não foi possível contar os administradores.");
       stats.usuarios = null;
     }
 
-    // Processa contagem de Palestrantes
-    console.log("Resposta de /palestrante:", palestrantesRes.data);
-    if (Array.isArray(palestrantesRes.data)) {
-      stats.palestrantes = palestrantesRes.data.length;
+    // Processa contagem de Palestrantes (da rota /palestrante/count)
+    console.log("Resposta de /palestrante/count:", palestrantesCountRes.data);
+    if (palestrantesCountRes.data && typeof palestrantesCountRes.data.count === 'number') {
+      stats.palestrantes = palestrantesCountRes.data.count;
     } else {
-      console.warn("API /palestrante não retornou um array.");
-      stats.palestrantes = null;
+      // Se /palestrante/count falhar ou não existir, tenta /palestrante e conta.
+      // Isso só deve acontecer se você não conseguir implementar /palestrante/count no backend.
+      console.warn("API /palestrante/count não retornou { count: number }. Tentando GET /palestrante para contagem. Recebido de /palestrante/count:", palestrantesCountRes.data);
+      try {
+        const palestrantesListRes = await api.get<ListItem[]>('/palestrante');
+        if (Array.isArray(palestrantesListRes.data)) {
+            stats.palestrantes = palestrantesListRes.data.length;
+            console.log("Contagem de palestrantes obtida de GET /palestrante (lista):", stats.palestrantes);
+        } else {
+            console.warn("API /palestrante (lista) também não retornou um array.");
+            stats.palestrantes = null;
+        }
+      } catch (listError) {
+          console.error("Erro ao tentar buscar lista de palestrantes como fallback:", listError);
+          stats.palestrantes = null;
+      }
     }
 
-    // Processa contagem de Atividades no Cronograma
+    // Processa contagem de Atividades no Cronograma (da rota /cronograma)
     console.log("Resposta de /cronograma:", cronogramaRes.data);
     if (Array.isArray(cronogramaRes.data)) {
       stats.atividadesCronograma = cronogramaRes.data.length;
     } else {
-      console.warn("API /cronograma não retornou um array.");
+      console.warn("API /cronograma não retornou um array. Não foi possível contar as atividades.");
       stats.atividadesCronograma = null;
     }
 
   } catch (error: any) {
     console.error('Erro ao carregar dados do dashboard:', error);
-    if (error.response) {
-      console.error("Erro (API) - Dados:", error.response.data, "Status:", error.response.status, "URL:", error.config?.url);
-    } else if (error.request) {
-      console.error("Erro (Rede) - Nenhuma resposta para:", error.config?.url, error.request);
-    } else {
-      console.error('Erro (Config):', error.message);
+    if (error.isAxiosError && error.config) {
+      console.error("Falha na requisição para:", error.config.url);
     }
+    if (error.response) {
+      console.error("Erro (API) - Dados:", error.response.data, "Status:", error.response.status);
+    } else if (error.request) {
+      console.error("Erro (Rede) - Nenhuma resposta recebida. Request:", error.request);
+    } else {
+      console.error('Erro (Configuração/Script):', error.message);
+    }
+    // Reseta todos os dados em caso de erro
     userData.nome = 'Falha';
     userData.cargo = '';
     stats.usuarios = null;
@@ -236,6 +259,8 @@ const irParaHistorico = () => { router.push({ name: 'AdminHistorico' }); };
 const irParaGerenciarUsuarios = () => { router.push({ name: 'AdminUsuarios' }); };
 const irParaGerenciarCronograma = () => { router.push({ name: 'AdminCronograma' }); };
 const irParaGerenciarPalestrantes = () => { router.push({ name: 'AdminPalestrantes' }); };
+// NOVA FUNÇÃO PARA NAVEGAÇÃO
+const irParaGerenciarPatrocinadores = () => { router.push({ name: 'AdminPatrocinadores' }); };
 const verPaginaPrincipal = () => {
   const routeData = router.resolve({ name: 'Home' });
   window.open(routeData.href, '_blank');

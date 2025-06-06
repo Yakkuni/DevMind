@@ -13,6 +13,8 @@ import CronogramaAdminPage from '../pages/ADM/CronogramaDashboard.vue';
 // 1. Importe o componente da página de histórico (crie este arquivo se não existir)
 import HistoricoAdminPage from '../pages/ADM/HistoricoAdminPage.vue'; // Ajuste o caminho se necessário
 import PalestrantesDashboard from '../components/ADM/PalestrantesDashboard.vue';
+import PatrocinadoresDashboard from '../pages/ADM/PatrocinadoresDashboard.vue';
+import SobreNosPage from '../pages/SobreNosPage.vue';
 
 const routes = [
   // ... suas rotas públicas ...
@@ -23,6 +25,7 @@ const routes = [
       { path: '', name: 'Home', component: HomePage },
       { path: 'programacao', name: 'Programacao', component: SchedulePage },
       { path: 'patrocinadores', name: 'Patrocinadores', component: SponsorsPage },
+      { path: 'sobreNos', name: 'SobreNos', component: SobreNosPage },
     ],
   },
   {
@@ -57,6 +60,12 @@ const routes = [
         path: 'palestrantes',
         name: 'AdminPalestrantes', // O nome usado em router.push({ name: 'AdminPalestrantes' })
         component: PalestrantesDashboard, // Ajuste o caminho!
+        meta: { requiresAuth: true }
+      },
+      {
+        path: 'patrocinadores',
+        name: 'AdminPatrocinadores', // O nome usado em router.push({ name: 'AdminPalestrantes' })
+        component: PatrocinadoresDashboard, // Ajuste o caminho!
         meta: { requiresAuth: true }
       }
     ],

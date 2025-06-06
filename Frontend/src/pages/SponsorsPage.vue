@@ -1,81 +1,140 @@
 <template>
-  <section class="sponsors-section">
-    <div class="sponsors-container">
-      <h2 class="section-title">Nossos Parceiros</h2>
-      <p class="section-subtitle">
-        Agradecemos a todos os patrocinadores que tornam o DevMind possível e ajudam a impulsionar a comunidade de tecnologia.
-      </p>
+  <div class="page-container">
 
-      <div
-        class="sponsor-category"
-        v-for="(categorySponsors, categoryName) in categorizedSponsors"
-        :key="categoryName"
-        :class="`category-${String(categoryName).toLowerCase()}`"
-        v-show="categorySponsors.length > 0"
-      >
-        <h3 class="category-title">{{ categoryName }}</h3>
-        <div class="sponsor-logos-grid">
-          <a
-            v-for="sponsor in categorySponsors"
-            :key="sponsor.id"
-            :href="sponsor.link"
-            class="sponsor-logo-card"
-            target="_blank"
-            rel="noopener noreferrer"
-            :title="`Visitar ${sponsor.name}`"
+    <section class="sponsors-section">
+      <div class="sponsors-container">
+        <h2 class="section-title">Nossos Parceiros</h2>
+        <p class="section-subtitle">
+          Agradecemos a todos os patrocinadores que tornam o DevMind possível e ajudam a impulsionar a comunidade de tecnologia.
+        </p>
+
+        <div v-if="isLoading" class="loading-state">
+          <div class="spinner"></div>
+          <p>Carregando patrocinadores...</p>
+        </div>
+        <div v-else-if="error" class="error-state">
+          <p>{{ error }}</p>
+          <button class="btn btn-primary" @click="fetchSponsors">Tentar Novamente</button>
+        </div>
+        
+        <template v-else-if="sponsors.length > 0">
+          <div
+            class="sponsor-category"
+            v-for="(categorySponsors, categoryName) in categorizedSponsors"
+            :key="categoryName"
+            :class="`category-wrapper-${String(categoryName).toLowerCase()}`"
+            v-show="categorySponsors.length > 0"
           >
-            <img :src="sponsor.logo" :alt="`Logo ${sponsor.name}`" class="sponsor-image" />
-            </a>
+            <h3 class="category-title">{{ categoryName }}</h3>
+            <div class="sponsor-logos-grid" :class="`category-grid-${String(categoryName).toLowerCase()}`">
+              <a
+                v-for="sponsor in categorySponsors"
+                :key="sponsor.id"
+                :href="sponsor.link"
+                class="sponsor-logo-card"
+                target="_blank"
+                rel="noopener noreferrer"
+                :title="`Visitar ${sponsor.name}`"
+              >
+                <div class="logo-background">
+                  <img :src="sponsor.logoUrl" :alt="`Logo ${sponsor.name}`" class="sponsor-image" />
+                </div>
+              </a>
+            </div>
+          </div>
+        </template>
+        
+        <div v-else class="empty-state">
+          <p>Ainda não temos patrocinadores para esta edição. Fique de olho para novidades!</p>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
+  </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
-// import axios from 'axios'; // Descomente quando for buscar dados da API
+import api from '../services/api'; 
 
+// Interface que define como o nosso componente QUER ver os dados
 interface Sponsor {
   id: string | number;
   name: string;
-  logo: string;
+  logoUrl: string;
   link: string;
   category: 'Ouro' | 'Prata' | 'Bronze' | 'Apoio';
 }
 
-const sponsors = ref<Sponsor[]>([
-  { id: 1, name: 'Empresa Ouro Max', logo: 'https://via.placeholder.com/280x160/FFD700/000000?text=Ouro+MAX', link: '#', category: 'Ouro' },
-  { id: 2, name: 'Tech Gold Solutions', logo: 'https://via.placeholder.com/260x150/FFD700/000000?text=Ouro+Tech', link: '#', category: 'Ouro' },
-  { id: 3, name: 'Silver Systems', logo: 'https://via.placeholder.com/240x140/C0C0C0/000000?text=Prata+Systems', link: '#', category: 'Prata' },
-  { id: 4, name: 'Conect Prata', logo: 'https://via.placeholder.com/220x130/C0C0C0/000000?text=Prata+Conect', link: '#', category: 'Prata' },
-  { id: 5, name: 'Bronze Bits', logo: 'https://via.placeholder.com/200x120/CD7F32/FFFFFF?text=Bronze+Bits', link: '#', category: 'Bronze' },
-  { id: 6, name: 'Dev Bronze Co.', logo: 'https://via.placeholder.com/180x110/CD7F32/FFFFFF?text=Bronze+Dev', link: '#', category: 'Bronze' },
-  { id: 7, name: 'Apoio Inovador', logo: 'https://via.placeholder.com/160x100/D3D3D3/000000?text=Apoio', link: '#', category: 'Apoio' },
-]);
+// Interface que representa os dados como eles VÊM da sua API
+interface SponsorFromAPI {
+  id: string | number;
+  nome: string;
+  logo: string;
+  categoria: string;
+  redeSocial: string;
+}
 
-// Lógica para buscar patrocinadores da API (exemplo)
-// async function fetchSponsors() { /* ... */ }
-// onMounted(() => { fetchSponsors(); });
+const sponsors = ref<Sponsor[]>([]);
+const isLoading = ref(true);
+const error = ref<string | null>(null);
+
+function capitalizeFirstLetter(str: string): string {
+  if (!str) return 'Apoio';
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+async function fetchSponsors() {
+  isLoading.value = true;
+  error.value = null;
+  try {
+    const response = await api.get<SponsorFromAPI[]>('/patrocinador');
+    
+    if (Array.isArray(response.data)) {
+      sponsors.value = response.data.map(apiSponsor => {
+        return {
+          id: apiSponsor.id,
+          name: apiSponsor.nome,
+          logoUrl: apiSponsor.logo,
+          link: apiSponsor.redeSocial,
+          category: capitalizeFirstLetter(apiSponsor.categoria) as Sponsor['category'],
+        };
+      });
+    } else {
+      console.warn("A API /patrocinador não retornou um array esperado:", response.data);
+      sponsors.value = [];
+    }
+  } catch (err) {
+    console.error("Erro ao carregar patrocinadores:", err);
+    error.value = "Não foi possível carregar a lista de patrocinadores. Por favor, tente novamente mais tarde.";
+    sponsors.value = [];
+  } finally {
+    isLoading.value = false;
+  }
+}
+
+onMounted(() => {
+  fetchSponsors();
+});
 
 const categorizedSponsors = computed(() => {
   const categoryOrder: Sponsor['category'][] = ['Ouro', 'Prata', 'Bronze', 'Apoio'];
-  const categories: { [key in Sponsor['category']]?: Sponsor[] } = {};
-  categoryOrder.forEach(cat => { categories[cat] = []; });
+  const categories: { [key: string]: Sponsor[] } = {};
 
-  sponsors.value.forEach((sponsor) => {
-    if (categories[sponsor.category]) {
-      categories[sponsor.category]?.push(sponsor);
-    } else {
-      if (!categories['Apoio']) categories['Apoio'] = [];
-      categories['Apoio']?.push(sponsor);
-    }
+  categoryOrder.forEach(cat => {
+    categories[cat] = [];
   });
 
+  sponsors.value.forEach((sponsor) => {
+    const categoryKey = sponsor.category || 'Apoio';
+    if (categories[categoryKey]) {
+      categories[categoryKey].push(sponsor);
+    }
+  });
+  
   const filteredCategories: { [key: string]: Sponsor[] } = {};
   for (const category of categoryOrder) {
-    if (categories[category] && categories[category]!.length > 0) {
-      filteredCategories[category] = categories[category]!;
+    if (categories[category] && categories[category].length > 0) {
+      filteredCategories[category] = categories[category];
     }
   }
   return filteredCategories;
@@ -83,169 +142,220 @@ const categorizedSponsors = computed(() => {
 </script>
 
 <style scoped lang="scss">
-// Suas variáveis globais
+// --- Variáveis de Tema ---
 $principal: #2C2966;
 $complemento: #131047;
-$complementoCLaro: #6C6C94;
 $destaque: #FFA051;
 $branco: #ffffff;
-$preto: #000000;
-// $cinza-borda-suave: #e0e0e0; // Pode não ser necessário com fundo escuro
-// $cinza-fundo-secao: #f4f6f8; // Não será mais usado para o fundo principal desta seção
+$texto-claro: rgba($branco, 0.85);
 
+// Cores para as categorias
+$ouro: #FFD700;
+$prata: #C0C0C0;
+$bronze: #CD7F32;
+$apoio-borda: #6C6C94;
+
+
+// --- Estilos da Página e Cabeçalho ---
+.page-container {
+  background-color: $complemento;
+}
+
+.site-header {
+  background-color: $complemento;
+  padding: 1rem 2rem;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  
+  .header-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .logo {
+    color: $branco;
+    font-size: 1.5rem;
+    font-weight: bold;
+    text-decoration: none;
+  }
+
+  .main-nav ul {
+    list-style: none;
+    display: flex;
+    gap: 2rem;
+    margin: 0;
+    padding: 0;
+
+    a {
+      color: $texto-claro;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.2s ease;
+      position: relative;
+      padding-bottom: 0.5rem;
+
+      &.active, &:hover {
+        color: $branco;
+      }
+      &.active::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 2px;
+        background-color: $destaque;
+      }
+    }
+  }
+
+  .btn-cta {
+    background-color: $destaque;
+    color: $principal;
+    padding: 0.6rem 1.2rem;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: background-color 0.2s ease;
+
+    &:hover {
+      background-color: darken($destaque, 10%);
+    }
+  }
+}
+
+// --- Estilos da Seção de Patrocinadores ---
 .sponsors-section {
-  padding: 4rem 1.5rem;
-  // ANTERIOR: background-color: $cinza-fundo-secao;
-  background-color: $complemento; // NOVO: Fundo escuro para a seção
-  color: $branco; // Cor de texto padrão para a seção agora é branca
+  padding: 5rem 1.5rem;
   text-align: center;
-  // Adiciona padding-top para compensar a altura da navbar se ela for fixa e transparente.
-  // Se a navbar não for fixa, ou se ela já tiver seu próprio fundo sólido, este padding pode não ser necessário
-  // ou precisará ser ajustado. Assumindo que a Navbar tem ~70px de altura:
-  // padding-top: calc(70px + 4rem); // Exemplo se navbar for fixa e transparente
+  color: $branco;
 }
 
 .sponsors-container {
-  max-width: 1200px;
+  max-width: 1100px;
   margin: 0 auto;
 }
 
+.section-title, .category-title {
+  text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
 .section-title {
-  font-size: clamp(2.2rem, 5vw, 3.2rem);
-  // ANTERIOR: color: $principal;
-  color: $branco; // NOVO: Título claro sobre fundo escuro
+  font-size: clamp(2.2rem, 5vw, 3rem);
   font-weight: 700;
-  margin-bottom: 0.75rem;
+  margin-bottom: 1rem;
 }
 
 .section-subtitle {
   font-size: clamp(1rem, 2.5vw, 1.15rem);
-  // ANTERIOR: color: $complementoCLaro;
-  color: lighten($complementoCLaro, 25%); // Mantém um tom claro, mas ajustado para fundo escuro
-  max-width: 700px;
-  margin: 0 auto 3rem auto;
-  line-height: 1.6;
+  color: $texto-claro;
+  max-width: 750px;
+  margin: 0 auto 4rem auto;
+  line-height: 1.7;
 }
 
 .sponsor-category {
-  margin-bottom: 3.5rem;
-  &:last-child {
-    margin-bottom: 0;
-  }
+  margin-bottom: 4.5rem;
+  &:last-child { margin-bottom: 0; }
 }
 
 .category-title {
-  font-size: clamp(1.5rem, 4vw, 2rem);
+  font-size: clamp(1.6rem, 4vw, 2.2rem);
   font-weight: 600;
-  // ANTERIOR: color: $complemento;
-  color: $branco; // NOVO: Título da categoria claro
-  margin-bottom: 2rem;
+  margin-bottom: 2.5rem;
   position: relative;
   display: inline-block;
-  padding-bottom: 0.5rem;
+  padding-bottom: 0.75rem;
 
   &::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 60px;
-    height: 3px;
-    background-color: $destaque; // Destaque mantém bem
-    border-radius: 2px;
+    content: ''; position: absolute; bottom: 0; left: 50%;
+    transform: translateX(-50%); width: 80px; height: 4px;
+    background-color: $destaque; border-radius: 2px;
   }
 }
 
+// 2. LÓGICA DE CENTRALIZAÇÃO IMPLEMENTADA AQUI
 .sponsor-logos-grid {
   display: flex;
-  justify-content: center;
+  justify-content: center; // Centraliza os itens na linha
   align-items: center;
-  flex-wrap: wrap;
-  gap: 2rem;
-
-  @media (max-width: 768px) {
-    gap: 1.5rem;
-  }
+  flex-wrap: wrap; // Permite que os itens quebrem para a próxima linha
+  gap: 1.5rem;
 }
 
 .sponsor-logo-card {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 1.5rem;
-  background-color: $branco; // Cards dos logos continuam brancos para destaque
-  border-radius: 12px;
-  box-shadow: 0 6px 18px rgba($preto, 0.15); // Sombra um pouco mais forte sobre fundo escuro
-  transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  transition: transform 0.3s ease;
   text-decoration: none;
-  min-height: 120px;
+  
+  // Largura definida para cada categoria
+  &.cat-ouro { flex-basis: calc(33.33% - 1.5rem); }
+  &.cat-prata { flex-basis: calc(20% - 1.5rem); }
+  &.cat-bronze { flex-basis: calc(12.5% - 1.5rem); }
+  &.cat-apoio { flex-basis: calc(12.5% - 1.5rem); }
 
-  &:hover {
-    transform: translateY(-6px) scale(1.03);
-    box-shadow: 0 10px 25px rgba($preto, 0.2);
+  .logo-background {
+    display: flex; align-items: center; justify-content: center;
+    background-color: $branco;
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+    padding: 0.75rem;
+    width: 100%;
+    height: 120px;
+    transition: background-color 0.3s ease;
   }
-
+  
+  &:hover { transform: translateY(-8px); }
   .sponsor-image {
-    max-width: 100%;
+    max-width: 100%; max-height: 90%;
     object-fit: contain;
+    filter: grayscale(100%);
+    transition: filter 0.3s ease;
+  }
+  &:hover .sponsor-image { filter: grayscale(0%); }
+}
+
+// Estilos de borda e altura por categoria
+.category-wrapper-ouro .logo-background { border: 4px solid $ouro; height: 180px; }
+.category-wrapper-prata .logo-background { border: 3px solid $prata; height: 140px; }
+.category-wrapper-bronze .logo-background { border: 3px solid $bronze; height: 100px; }
+.category-wrapper-apoio .logo-background { border: 2px solid $apoio-borda; height: 100px; }
+
+// --- Responsividade ---
+@media (max-width: 1024px) {
+  .sponsor-logo-card {
+    &.cat-ouro { flex-basis: calc(50% - 1.5rem); }
+    &.cat-prata { flex-basis: calc(33.33% - 1.5rem); }
+    &.cat-bronze { flex-basis: calc(25% - 1.5rem); }
+    &.cat-apoio { flex-basis: calc(25% - 1.5rem); }
   }
 }
 
-// Estilos específicos por categoria para tamanho dos logos
-.category-ouro {
-  .sponsor-logo-card {
-    padding: 2rem;
-    min-width: 220px;
-    .sponsor-image { max-height: 120px; }
-  }
-}
-.category-prata {
-  .sponsor-logo-card {
-    min-width: 180px;
-    .sponsor-image { max-height: 100px; }
-  }
-}
-.category-bronze {
-  .sponsor-logo-card {
-    min-width: 150px;
-    padding: 1.25rem;
-    .sponsor-image { max-height: 80px; }
-  }
-}
-.category-apoio {
-  .sponsor-logo-card {
-    min-width: 120px;
-    padding: 1rem;
-    .sponsor-image { max-height: 70px; }
-  }
-}
-
-// Ajustes responsivos adicionais
 @media (max-width: 768px) {
-  .sponsors-section {
-    // Se a navbar for fixa, o padding-top da seção pode precisar de ajuste aqui também
-    // padding-top: calc(60px + 2rem); // Exemplo de altura de navbar mobile + padding da seção
+  .site-header {
+    flex-direction: column;
+    gap: 1rem;
+    .main-nav { display: none; } // Esconde a navegação principal, idealmente seria um menu hambúrguer
   }
-  .section-title {
-    font-size: clamp(1.8rem, 6vw, 2.5rem);
+  .sponsor-logo-card {
+    &.cat-ouro { flex-basis: calc(50% - 1rem); }
+    &.cat-prata { flex-basis: calc(50% - 1rem); }
+    &.cat-bronze { flex-basis: calc(33.33% - 1rem); }
+    &.cat-apoio { flex-basis: calc(33.33% - 1rem); }
   }
-  .section-subtitle {
-     margin-bottom: 2rem;
+}
+
+@media (max-width: 480px) {
+    .sponsor-logo-card {
+    &.cat-ouro { flex-basis: 100%; }
+    &.cat-prata { flex-basis: calc(50% - 1rem); }
+    &.cat-bronze { flex-basis: calc(50% - 1rem); }
+    &.cat-apoio { flex-basis: calc(50% - 1rem); }
   }
-  .category-title {
-    font-size: clamp(1.3rem, 5vw, 1.7rem);
-    margin-bottom: 1.5rem;
-  }
-  .category-ouro .sponsor-logo-card .sponsor-image,
-  .category-prata .sponsor-logo-card .sponsor-image,
-  .category-bronze .sponsor-logo-card .sponsor-image,
-  .category-apoio .sponsor-logo-card .sponsor-image {
-    max-height: 70px;
-  }
-   .category-ouro .sponsor-logo-card { padding: 1.5rem; min-width: 150px; }
-   .category-prata .sponsor-logo-card { padding: 1.25rem; min-width: 130px; }
-   .category-bronze .sponsor-logo-card, .category-apoio .sponsor-logo-card { padding: 1rem; min-width: 100px; }
 }
 </style>
