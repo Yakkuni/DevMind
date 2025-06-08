@@ -15,6 +15,8 @@ import HistoricoAdminPage from '../pages/ADM/HistoricoAdminPage.vue'; // Ajuste 
 import PalestrantesDashboard from '../components/ADM/PalestrantesDashboard.vue';
 import PatrocinadoresDashboard from '../pages/ADM/PatrocinadoresDashboard.vue';
 import SobreNosPage from '../pages/SobreNosPage.vue';
+import AdminImagens from '../pages/ADM/AdminImagens.vue';
+import AdminUsuarios from '../pages/ADM/AdminUsuarios.vue';
 
 const routes = [
   // ... suas rotas públicas ...
@@ -66,6 +68,18 @@ const routes = [
         path: 'patrocinadores',
         name: 'AdminPatrocinadores', // O nome usado em router.push({ name: 'AdminPalestrantes' })
         component: PatrocinadoresDashboard, // Ajuste o caminho!
+        meta: { requiresAuth: true }
+      },
+      {
+        path: 'imagens',
+        name: 'AdminImagens', // O nome usado em router.push({ name: 'AdminImagens' })
+        component: AdminImagens,
+        meta: { requiresAuth: true }
+      },
+            {
+        path: 'usuarios',
+        name: 'AdminUsuarios', // O nome usado em router.push({ name: 'AdminImagens' })
+        component: AdminUsuarios,
         meta: { requiresAuth: true }
       }
     ],

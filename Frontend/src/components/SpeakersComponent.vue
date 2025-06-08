@@ -26,7 +26,7 @@
           <div class="speaker-card">
             <div class="label">{{ sp.tag || 'Palestrante Confirmado' }}</div>
             <div class="photo-wrapper">
-              <img :src="sp.foto" :alt="`Foto de ${sp.nome}`" class="photo" />
+              <img :src="getFullImageUrl(sp.foto)" :alt="`Foto de ${sp.nome}`" class="photo" />
             </div>
             <div class="name">{{ sp.nome }}</div>
             <div class="description">{{ sp.descricao }}</div>
@@ -42,7 +42,7 @@
               </a>
               <a v-if="sp.redes.site" :href="sp.redes.site" target="_blank" rel="noopener noreferrer" :aria-label="`Site de ${sp.nome}`" title="Site Pessoal">
                 <svg viewBox="0 0 24 24"><path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M11,16.9L7.2,14.61L8.8,13.39L11,14.93L16.26,10.33L17.4,11.33L11,16.9Z" /></svg> 
-                </a>
+              </a>
             </div>
           </div>
         </div>
@@ -58,17 +58,16 @@
 </template>
 
 <script setup lang="ts">
-// O SCRIPT PERMANECE O MESMO DA VERSÃO ANTERIOR
 import { ref, onMounted, onBeforeUnmount, computed } from 'vue';
 import axios from 'axios';
 
+// --- Interfaces ---
 interface SocialLinks {
   instagram?: string | null;
   linkedin?: string | null;
   youtube?: string | null;
   site?: string | null;
 }
-
 interface Speaker {
   id: string;
   nome: string;
@@ -78,6 +77,21 @@ interface Speaker {
   tag?: string;
 }
 
+// --- ALTERAÇÃO 2: Função auxiliar para montar a URL completa ---
+/**
+ * Constrói a URL completa para uma imagem a partir da variável de ambiente.
+ * @param relativeUrl A URL vinda da API (ex: /uploads/foto.png)
+ */
+function getFullImageUrl(relativeUrl: string | undefined): string {
+  if (!relativeUrl || relativeUrl.startsWith('http')) {
+    return relativeUrl || ''; // Retorna string vazia se for undefined para evitar erro no 'src'
+  }
+  const baseUrl = import.meta.env.VITE_API_BASE_URL;
+  return `<span class="math-inline">\{baseUrl\}</span>{relativeUrl}`;
+}
+
+
+// --- Estado Reativo ---
 const speakers = ref<Speaker[]>([]);
 const carouselTrack = ref<HTMLElement>();
 const direction = ref<'next'|'prev'>('next');
@@ -95,10 +109,14 @@ const hasSocialLinks = (redes: SocialLinks) => {
     return Object.values(redes).some(link => link && link.trim() !== '');
 };
 
+// --- ALTERAÇÃO 3: Usando a variável de ambiente na busca de dados ---
 async function fetchSpeakers() {
   console.log('Disparando fetchSpeakers...');
   try {
-    const res = await axios.get<Speaker[]>('/palestrante');
+    // Monta a URL completa da API dinamicamente
+    const apiUrl = `${import.meta.env.VITE_API_BASE_URL}/palestrante`;
+    const res = await axios.get<Speaker[]>(apiUrl);
+
     speakers.value = Array.isArray(res.data) ? res.data : [];
     if (!Array.isArray(res.data)) {
          console.warn('Formato inesperado da resposta da API de palestrantes:', res.data);
@@ -112,13 +130,13 @@ async function fetchSpeakers() {
   } 
 }
 
+// O restante da lógica do carrossel permanece a mesma
 function startAuto() {
   clearInterval(interval.value);
   if (speakers.value.length > (isMobile.value ? 1 : slidesVisiveisDesktop)) {
     interval.value = window.setInterval(nextSlide, autoTime.value);
   }
 }
-
 function resetCarouselVisualState() {
   isAnimating.value = false;
   trackPosition.value = 0;
@@ -126,20 +144,17 @@ function resetCarouselVisualState() {
     void carouselTrack.value.offsetWidth;
   }
 }
-
 function resetCarouselAndRestartAuto() {
   clearInterval(interval.value);
   resetCarouselVisualState();
   startAuto();
 }
-
 function nextSlide() {
   if (isAnimating.value || speakers.value.length <= (isMobile.value ? 1 : slidesVisiveisDesktop)) return;
   direction.value = 'next';
   isAnimating.value = true;
   trackPosition.value = -slidePct.value;
 }
-
 function prevSlide() {
   if (isAnimating.value || speakers.value.length <= (isMobile.value ? 1 : slidesVisiveisDesktop)) return;
   direction.value = 'prev';
@@ -153,7 +168,6 @@ function prevSlide() {
       trackPosition.value = 0;
   });
 }
-
 function onTransitionEnd() {
   if (!isAnimating.value) return;
   if (direction.value === 'next') {
@@ -168,19 +182,16 @@ function onTransitionEnd() {
     void carouselTrack.value.offsetWidth;
   }
 }
-
 function onMqChange(e: MediaQueryListEvent) {
   isMobile.value = e.matches;
   resetCarouselAndRestartAuto();
 }
-
 const handleSpeakersUpdate = () => {
   console.log('Evento speakersUpdated recebido. Atualizando palestrantes...');
   fetchSpeakers().then(() => {
     resetCarouselAndRestartAuto();
   });
 };
-
 onMounted(() => {
   isMobileQuery.value.addEventListener('change', onMqChange);
   fetchSpeakers().then(() => {
@@ -188,7 +199,6 @@ onMounted(() => {
   });
   window.addEventListener('speakersUpdated', handleSpeakersUpdate);
 });
-
 onBeforeUnmount(() => {
   isMobileQuery.value.removeEventListener('change', onMqChange);
   clearInterval(interval.value);
@@ -210,7 +220,6 @@ $cinza-borda-suave: #e0e0e0;
   padding: 4rem 1rem;
   text-align: center; 
 }
-
 .section-title {
   display: inline-block; 
   position: relative;
@@ -234,21 +243,18 @@ $cinza-borda-suave: #e0e0e0;
     border-radius: 2px;
   }
 }
-
 .carousel-container {
   position: relative;
   overflow: hidden;
   max-width: 1200px;
   width: 90%; 
   margin: 0 auto;
-  padding-top: 20px;    
+  padding-top: 20px;     
   padding-bottom: 20px; 
 }
-
 .carousel-track {
   display: flex;
 }
-
 .carousel-item {
   flex: 0 0 100%;
   padding: 0 0.75rem; 
@@ -261,10 +267,9 @@ $cinza-borda-suave: #e0e0e0;
     flex: 0 0 calc(100% / 3);
   }
   @media (min-width: 1024px) {
-     padding: 0 1rem;
+      padding: 0 1rem;
   }
 }
-
 .speaker-card {
   background: $branco;
   border-radius: 16px;
@@ -283,7 +288,6 @@ $cinza-borda-suave: #e0e0e0;
     transform: translateY(-8px); 
     box-shadow: 0 12px 35px rgba($complemento, 0.12), 0 6px 15px rgba($complemento, 0.08);
   }
-
   .label {
     display: inline-block;
     background-color: $destaque;
@@ -297,7 +301,6 @@ $cinza-borda-suave: #e0e0e0;
     margin: 0 auto 1.25rem auto;
     line-height: 1;
   }
-
   .photo-wrapper {
     margin: 0 auto 1.25rem auto;
     width: 140px;
@@ -311,7 +314,6 @@ $cinza-borda-suave: #e0e0e0;
     height: 100%;
     object-fit: cover;
   }
-
   .name {
     font-size: 1.3rem;
     font-weight: 700;
@@ -319,7 +321,6 @@ $cinza-borda-suave: #e0e0e0;
     margin-bottom: 0.5rem;
     line-height: 1.3;
   }
-
   .description {
     font-size: 0.9rem;
     color: $complementoCLaro;
@@ -333,32 +334,28 @@ $cinza-borda-suave: #e0e0e0;
     &::-webkit-scrollbar-thumb { background-color: darken($cinza-borda-suave, 15%); border-radius: 3px; }
     &::-webkit-scrollbar-track { background: transparent; }
   }
-
   .social-links {
     margin-top: auto;
     padding-top: 0.75rem;
     display: flex;
     justify-content: center;
-    gap: 1rem; // Espaçamento entre ícones
-
+    gap: 1rem;
     a {
-      color: $complementoCLaro; // Cor padrão do ícone
+      color: $complementoCLaro;
       transition: color 0.3s ease, transform 0.2s ease;
-      line-height: 0; // Para alinhar SVGs se eles tiverem espaço extra
-
+      line-height: 0;
       &:hover {
-        color: $destaque; // Cor do ícone no hover
+        color: $destaque;
         transform: translateY(-2px);
       }
       svg {
-        width: 22px; // Tamanho do SVG
+        width: 22px;
         height: 22px;
-        fill: currentColor; // Faz o SVG herdar a cor do 'a'
+        fill: currentColor;
       }
     }
   }
 }
-
 .nav-button {
   position: absolute;
   top: 50%;
@@ -375,14 +372,12 @@ $cinza-borda-suave: #e0e0e0;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 4px 12px rgba($preto, 0.08);
   z-index: 20;
-
   svg {
     width: 28px;
     height: 28px;
     color: $principal;
     transition: color 0.3s ease;
   }
-
   &:hover {
     background: $destaque;
     border-color: $destaque;
@@ -395,14 +390,12 @@ $cinza-borda-suave: #e0e0e0;
   &:active {
     transform: translateY(-50%) scale(0.98);
   }
-
   &.prev {
     left: 15px;
   }
   &.next {
     right: 15px;
   }
-
   @media (max-width: 768px) {
     width: 40px;
     height: 40px;

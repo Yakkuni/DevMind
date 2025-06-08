@@ -43,10 +43,6 @@ const props = defineProps({
 </script>
 
 <style scoped lang="scss">
-// Suas variáveis globais (assumindo que estão disponíveis globalmente)
-// $principal: #2C2966;
-// $complemento: #131047;
-// $destaque: #FFA051;
 
 // Para este exemplo, vou redeclará-las para autossuficiência do snippet.
 $principal: #2C2966;

@@ -11,7 +11,7 @@ import { Usuario } from "../model/Usuario";
 export class ImageService {
     constructor(private readonly dao:ImageDao){}
 
-    public async uploadAndCreate(file: Express.Multer.File, usuario: string): Promise<DomainImage> {
+    public async uploadAndCreate(file: Express.Multer.File, usuario: string, customName?: any): Promise<DomainImage> {
         // Monta a URL pública (no caso de armazenamento local)
         const url = `/uploads/${file.filename}`;
 

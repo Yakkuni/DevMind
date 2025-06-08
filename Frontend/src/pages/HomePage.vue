@@ -52,7 +52,7 @@ import AbaoutUs from '../components/AboutUs.vue';
 import CarouselComponent from '../components/CarouselComponent.vue';
 import SpeakersComponent from '../components/SpeakersComponent.vue';
 import CardsContainer from '../components/CardsContainer.vue';
-import OtherEditions from '../components/OtherEditions.vue';
+import OtherEditions from '../components/Images.vue';
 
 const handleParticiparClick = () => {
   console.log("Botão 'Participar do Evento' (Hero) clicado");
@@ -257,6 +257,8 @@ $preto: #000000;
        &:active {
         transform: translateY(0);
       }
+
+      
     }
   }
 }
