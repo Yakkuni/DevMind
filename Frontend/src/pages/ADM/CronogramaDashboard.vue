@@ -2,7 +2,7 @@
   <div class="schedule-dashboard-page">
     <header class="page-header">
       <div class="header-content">
-        <h1>Gerenciamento de Cronograma</h1>
+        <h1>Gerenciamento de Programação</h1>
         <button @click="voltarParaDashboard" class="btn btn-outline-light">
           <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
           Voltar ao Painel
@@ -17,7 +17,7 @@
 
       <div class="card">
         <div class="card-header">
-          <h3>Cronograma Atual</h3>
+          <h3>Programação Atual</h3>
           <button class="btn btn-primary" @click="abrirModalParaCriar">
             <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
             Adicionar Atividade
@@ -26,7 +26,7 @@
 
         <div v-if="isLoading" class="loading-state">
           <div class="spinner"></div>
-          <p>Carregando cronograma...</p>
+          <p>Carregando programação...</p>
         </div>
         
         <div v-else-if="!atividades.length" class="empty-state">

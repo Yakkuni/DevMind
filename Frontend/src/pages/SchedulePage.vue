@@ -33,7 +33,7 @@
       <button @click="fetchSchedule" class="btn btn-retry">Tentar Novamente</button>
     </section>
     <section v-else-if="availableDates.length === 0" class="feedback-section empty-state">
-      <p>Nenhum cronograma disponível no momento.</p>
+      <p>Nenhuma programação disponível no momento.</p>
     </section>
 
     <section class="activities-list-section" v-else-if="selectedDateKey && activitiesForSelectedDate.length > 0">
@@ -76,7 +76,7 @@ import axios from 'axios';
 
 const headerBackgroundImage = ref('/img/banners/schedule_banner.jpg');
 const headerOverlayColor = ref('rgba(19, 16, 71, 0.75)'); // $complemento com opacidade
-const pageTitle = ref('Cronograma Oficial');
+const pageTitle = ref('Programação Oficial');
 
 // --- Tipagem ---
 // Interface reflete os campos vindos da API/banco de dados

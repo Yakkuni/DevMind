@@ -22,6 +22,8 @@
 
     <CarouselComponent />
 
+    <GoldSponsors />
+    
     <AbaoutUs /> 
 
     <SpeakersComponent class="section-spacer" /> <section class="aboutEventBanner"> 
@@ -53,6 +55,7 @@ import CarouselComponent from '../components/CarouselComponent.vue';
 import SpeakersComponent from '../components/SpeakersComponent.vue';
 import CardsContainer from '../components/CardsContainer.vue';
 import OtherEditions from '../components/Images.vue';
+import GoldSponsors from '../components/GoldSponsors.vue';
 
 const handleParticiparClick = () => {
   console.log("Botão 'Participar do Evento' (Hero) clicado");

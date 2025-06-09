@@ -136,7 +136,7 @@ function displayMessage(text: string, type: 'success' | 'error', duration: numbe
 }
 
 function voltarParaDashboard() { 
-  router.push({ name: 'AdminDashboard' }); 
+  router.push({ name: 'Dashboard' }); 
 }
 
 async function carregarUsuarios() {
