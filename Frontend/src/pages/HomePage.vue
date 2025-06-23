@@ -18,44 +18,67 @@
           </button>
         </div>
       </div>
+      
+      <div v-if="!showFullPage" class="scroll-indicator">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
+      </div>
+
     </section>
 
     <CarouselComponent />
 
-    <GoldSponsors />
-    
-    <AbaoutUs /> 
-
-    <SpeakersComponent class="section-spacer" /> <section class="aboutEventBanner"> 
-      <div class="banner-content">
-        <h2>Próxima Edição em Breve!</h2>
-        <p>Fique ligado para mais novidades e prepare-se para uma imersão tecnológica.</p>
-      </div>
-    </section>
-
-    <section class="about-event-section"> 
-      <div class="about-event-container">
-        <div class="header-what-to-expect">
-          <h1>O QUE ESPERAR?</h1>
-          <button class="detail-button" @click="handleVerDetalhesClick">
-            Ver detalhes do evento
-          </button>
+    <template v-if="showFullPage">
+      <GoldSponsors />
+      <AbaoutUs /> 
+      <SpeakersComponent />
+      
+      <section class="about-event-section"> 
+        <div class="about-event-container">
+          <div class="header-what-to-expect">
+            <h1>O QUE ESPERAR?</h1>
+            <button class="detail-button" @click="handleVerDetalhesClick">
+              Ver detalhes do evento
+            </button>
+          </div>
+          <CardsContainer />
         </div>
-        <CardsContainer />
-      </div>
-    </section>
-
-    <OtherEditions/> 
+      </section>
+      <OtherEditions/> 
+    </template>
   </div>
 </template>
 
 <script setup lang="ts">
+import { ref, onMounted, onBeforeUnmount } from 'vue';
 import AbaoutUs from '../components/AboutUs.vue';
 import CarouselComponent from '../components/CarouselComponent.vue';
 import SpeakersComponent from '../components/SpeakersComponent.vue';
 import CardsContainer from '../components/CardsContainer.vue';
 import OtherEditions from '../components/Images.vue';
 import GoldSponsors from '../components/GoldSponsors.vue';
+
+// --- LÓGICA DE VISIBILIDADE ---
+const showFullPage = ref(false);
+
+const handleFirstScroll = () => {
+  showFullPage.value = true;
+  sessionStorage.setItem('hasVisitedDevMindSession', 'true');
+  window.removeEventListener('scroll', handleFirstScroll);
+};
+
+onMounted(() => {
+  const hasVisited = sessionStorage.getItem('hasVisitedDevMindSession');
+  if (hasVisited) {
+    showFullPage.value = true;
+  } else {
+    window.addEventListener('scroll', handleFirstScroll);
+  }
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener('scroll', handleFirstScroll);
+});
+// --- FIM DA LÓGICA ---
 
 const handleParticiparClick = () => {
   console.log("Botão 'Participar do Evento' (Hero) clicado");
@@ -64,26 +87,29 @@ const handleParticiparClick = () => {
 
 const handleVerDetalhesClick = () => {
   console.log("Botão 'Ver detalhes do evento' clicado");
+  window.open("https://www.even3.com.br/devmind-571467/", "_blank");
 };
 </script>
 
 <style scoped lang="scss">
-// Suas variáveis globais (assumindo que estão disponíveis)
+// --- Variáveis de Tema ---
 $principal: #2C2966;
 $complemento: #131047;
 $complementoCLaro: #6C6C94;
 $destaque: #FFA051;
 $branco: #ffffff;
 $preto: #000000;
+$cinza-fundo: #f8f9fa;
 
-// Espaçador padrão entre seções (APLICADO SELETIVAMENTE AGORA)
-// Esta classe ainda existe para ser usada onde o espaçamento é desejado.
-.section-spacer {
-  margin-top: 3rem;
-  margin-bottom: 3rem;
-  @media (min-width: 769px) {
-    margin-top: 4rem;
-    margin-bottom: 4rem;
+$section-spacing: 4rem; 
+
+.homepage-container > section {
+  padding-top: $section-spacing;
+  padding-bottom: $section-spacing;
+
+  &:first-child {
+    padding-top: 0;
+    padding-bottom: 0;
   }
 }
 
@@ -93,18 +119,21 @@ $preto: #000000;
   background-image: url('@/assets/initialBanner.png');
   background-size: cover;
   background-position: center center;
-  padding: clamp(4rem, 15vh, 8rem) 1.5rem;
+  padding: 6rem 1.5rem;
   color: $branco;
-  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
   min-height: 80vh;
-  margin-bottom: 0; // Garante que não há margem inferior aqui
+
+  &.slideshow {
+    padding-top: 6rem !important;
+    padding-bottom: 6rem !important;
+  }
 
   @media (max-width: 768px) {
     min-height: 70vh;
-    padding: clamp(3rem, 20vh, 6rem) 1rem;
+    padding: 4rem 1rem;
     padding-top: 6rem;
   }
 }
@@ -179,116 +208,82 @@ $preto: #000000;
   // Estilos específicos do Hero CTA, se necessário
 }
 
-
-/* Banner Intermediário (aboutEventBanner) */
-.aboutEventBanner {
-  background-color: $complemento;
-  color: $branco;
-  padding: 3rem 1.5rem; // Padding interno para o conteúdo do banner
-  text-align: center;
-  // margin-top e margin-bottom agora são controlados pela ausência de .section-spacer
-  // ou pela presença de .section-spacer em componentes adjacentes.
-
-  .banner-content {
-    position: relative;
-    z-index: 2; // Caso haja um overlay no banner no futuro
-    max-width: 700px;
-    margin: 0 auto;
-
-    h2 {
-      font-size: clamp(1.5rem, 4vw, 2.2rem);
-      color: $destaque;
-      margin-bottom: 1rem;
-      font-weight: 700;
-    }
-    p {
-      font-size: clamp(0.9rem, 2vw, 1.1rem);
-      color: lighten($complementoCLaro, 25%);
-      margin-bottom: 0; // Removida margem inferior se não houver botão
-    }
-  }
-}
-
+/* O Bloco de estilo para .aboutEventBanner FOI REMOVIDO DAQUI */
 
 /* Seção “O QUE ESPERAR?” */
 .about-event-section {
   background: $destaque;
-  padding: 4rem 1.5rem; // Padding interno para o conteúdo da seção
   color: $principal;
-  // margin-top e margin-bottom agora são controlados pela ausência de .section-spacer
-  // ou pela presença de .section-spacer em componentes adjacentes.
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+  border-bottom: 3px solid $complemento;
 
-  .about-event-container {
-    max-width: 1200px;
-    margin: 0 auto;
-  }
-
+  .about-event-container { max-width: 1200px; margin: 0 auto; }
   .header-what-to-expect {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 3rem;
-    gap: 1.5rem;
-
-    h1 {
-      font-size: clamp(1.8rem, 5vw, 2.8rem);
-      font-weight: 700;
-      margin: 0;
-      color: $principal;
-    }
-    
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+    margin-bottom: 3rem; gap: 1.5rem;
+    h1 { font-size: clamp(1.8rem, 5vw, 2.8rem); font-weight: 700; margin: 0; color: $principal; }
     .detail-button {
-      padding: 0.7rem 1.8rem;
-      background-color: $principal;
-      color: $branco;
-      border: 2px solid $principal;
-      font-weight: 600;
-      font-size: clamp(0.85rem, 1.8vw, 1rem);
-      border-radius: 25px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      box-shadow: 0 2px 8px rgba($complemento, 0.2);
-
-      &:hover {
-        background-color: $complemento;
-        border-color: $complemento;
-        color: $branco;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba($complemento, 0.3);
-      }
-       &:active {
-        transform: translateY(0);
-      }
-
-      
+      padding: 0.7rem 1.8rem; background-color: $principal; color: $branco; border: 2px solid $principal;
+      font-weight: 600; font-size: clamp(0.85rem, 1.8vw, 1rem); border-radius: 25px;
+      cursor: pointer; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba($complemento, 0.2);
+      &:hover { background-color: $complemento; border-color: $complemento; transform: translateY(-2px); box-shadow: 0 4px 12px rgba($complemento, 0.3); }
+      &:active { transform: translateY(0); }
     }
   }
 }
 
-/* Ajustes de Responsividade Globais para a Página */
+/* Fundo Padrão para seções sem cor específica */
+// A classe .aboutEventBanner foi removida do seletor :not()
+.homepage-container > section:not(.slideshow):not(.about-event-section) {
+  background-color: $branco;
+}
+
+/* Estilo do Indicador de Rolagem */
+.scroll-indicator {
+  position: absolute;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 3;
+  color: rgba($branco, 0.7);
+  animation: bounce 2s infinite;
+
+  svg {
+    width: 32px;
+    height: 32px;
+  }
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateX(-50%) translateY(0);
+  }
+  40% {
+    transform: translateX(-50%) translateY(-15px);
+  }
+  60% {
+    transform: translateX(-50%) translateY(-10px);
+  }
+}
+
+/* Ajustes de Responsividade */
 @media (max-width: 768px) {
+  .homepage-container > section {
+    padding-top: 3rem;
+    padding-bottom: 3rem;
+  }
+  
   .slideshow__container {
-    h1 {
-      margin-bottom: 0.8rem;
-    }
-    h6 {
-      margin-bottom: 2rem;
-    }
+    h1 { margin-bottom: 0.8rem; }
+    h6 { margin-bottom: 2rem; }
   }
 
   .about-event-section .header-what-to-expect {
     flex-direction: column;
     text-align: center;
     gap: 1.5rem;
-    h1 {
-      margin-bottom: 0.5rem;
-    }
-  }
-  
-  .section-spacer { 
-    margin-top: 2rem;
-    margin-bottom: 2rem;
+    h1 { margin-bottom: 0.5rem; }
   }
 }
 </style>

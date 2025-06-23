@@ -54,6 +54,7 @@ $preto: #000000;
   padding: 3rem 1.5rem 1.5rem; // Padding ajustado (mais no topo)
   flex-shrink: 0; // Para layouts flex, evita que o footer seja espremido
   box-sizing: border-box;
+  border-top: 3px solid $destaque; 
 }
 
 .footer-container {

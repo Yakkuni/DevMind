@@ -112,140 +112,162 @@ onMounted(fetchImages);
 
 
 <style scoped lang="scss">
-  // Suas variáveis de tema
-  $principal: #2C2966;
-  $destaque: #FFA051;
-  $branco: #ffffff;
-  $preto: #000000;
-  
-  // ALTERAÇÃO 1: O CSS AGORA INCLUI UMA SEÇÃO @media PARA MOBILE
-  .event-gallery-section {
-    padding: 3rem 0; // Padding vertical, sem padding horizontal
-    background-color: #f7f7fa;
-    text-align: center;
-    overflow-x: hidden;
-  }
-  .section-title {
-    font-size: clamp(1.8rem, 5vw, 2.8rem);
-    color: $principal;
-    margin-bottom: 2.5rem;
-    font-weight: 700;
-  }
-  .carousel-3d-wrapper {
-    position: relative;
-    width: 100%;
-    height: 450px;
-    perspective: 1500px;
-  }
-  .carousel-3d-track {
-    width: 100%;
-    height: 100%;
-    position: relative;
-    transform-style: preserve-3d;
-  }
-  .slide-3d {
+// Suas variáveis de tema
+$principal: #2C2966;
+$destaque: #FFA051;
+$branco: #ffffff;
+$preto: #000000;
+$cinza-fundo: #f8f9fa;
+
+.event-gallery-section {
+  padding: 6rem 0;
+  background-color: $cinza-fundo;
+  text-align: center;
+  overflow-x: hidden;
+}
+
+.section-title {
+  display: inline-block; 
+  position: relative;
+  font-size: clamp(2.5rem, 5vw, 3.2rem);
+  color: $principal; 
+  font-weight: 800;
+  margin-bottom: 4rem;
+  padding-bottom: 1rem;
+  letter-spacing: -0.5px;
+
+  &::after {
+    content: '';
     position: absolute;
-    left: 0; right: 0; margin: 0 auto;
-    width: 45%; max-width: 650px;
-    aspect-ratio: 16 / 9;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%); 
+    width: 100px; 
+    height: 5px; 
+    background-color: $destaque; 
+    border-radius: 3px;
+  }
+}
+
+.carousel-3d-wrapper {
+  position: relative;
+  width: 100%;
+  // MUDANÇA: Altura do carrossel reduzida para se ajustar melhor às imagens.
+  height: 500px; 
+  perspective: 2000px;
+}
+
+.carousel-3d-track {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+}
+
+.slide-3d {
+  position: absolute;
+  left: 0; right: 0; margin: 0 auto;
+  width: 55%; 
+  max-width: 800px;
+  aspect-ratio: 16 / 9;
+  top: 50%;
+  transform: translateY(-50%);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.25);
+  cursor: pointer;
+  transition: transform 0.6s cubic-bezier(0.25, 0.8, 0.25, 1), opacity 0.6s ease;
+  
+  .slide-image {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    pointer-events: none;
+  }
+
+  &.is-active { transform: translateY(-50%) translateZ(0) rotateY(0); opacity: 1; z-index: 10; }
+  &.is-prev { transform: translateY(-50%) translateX(-65%) translateZ(-350px) rotateY(45deg); opacity: 0.5; z-index: 5; }
+  &.is-next { transform: translateY(-50%) translateX(65%) translateZ(-350px) rotateY(-45deg); opacity: 0.5; z-index: 5; }
+  &.is-hidden-left { transform: translateY(-50%) translateX(-130%) translateZ(-600px) rotateY(50deg); opacity: 0; z-index: 1; }
+  &.is-hidden-right { transform: translateY(-50%) translateX(130%) translateZ(-600px) rotateY(-50deg); opacity: 0; z-index: 1; }
+  &.is-hidden { display: none; }
+}
+
+.nav-button {
+  position: absolute; top: 50%;
+  z-index: 20; background-color: rgba($branco, 0.95); border: none;
+  width: 60px; height: 60px;
+  border-radius: 50%; 
+  margin-top: -30px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: $principal; box-shadow: 0 5px 20px rgba($preto, 0.2);
+  transition: all 0.3s ease;
+  
+  svg { 
+    width: 36px; height: 36px; fill: currentColor; 
+  }
+  
+  &:hover { background-color: $destaque; transform: scale(1.1); }
+  
+  &.prev { left: 12%; }
+  &.next { right: 12%; }
+}
+
+@media (max-width: 900px) {
+  .nav-button {
+    &.prev { left: 5%; }
+    &.next { right: 5%; }
+  }
+}
+
+@media (max-width: 768px) {
+  .carousel-3d-wrapper {
+    // MUDANÇA: Altura menor também no mobile para evitar excesso de espaço.
+    height: 280px; 
+    perspective: none;
+  }
+  
+  .carousel-3d-track {
+    transform-style: flat;
+  }
+
+  .slide-3d {
+    width: 85%;
     top: 50%;
     transform: translateY(-50%);
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-    cursor: pointer;
-    transition: transform 0.6s cubic-bezier(0.25, 0.8, 0.25, 1), opacity 0.6s ease;
     
-    .slide-image {
-      width: 100%; height: 100%;
-      object-fit: cover;
-      pointer-events: none;
-    }
-
-    &.is-active { transform: translateY(-50%) translateZ(0) rotateY(0); opacity: 1; z-index: 10; }
-    &.is-prev { transform: translateY(-50%) translateX(-60%) translateZ(-250px) rotateY(40deg); opacity: 0.6; z-index: 5; }
-    &.is-next { transform: translateY(-50%) translateX(60%) translateZ(-250px) rotateY(-40deg); opacity: 0.6; z-index: 5; }
-    &.is-hidden-left { transform: translateY(-50%) translateX(-120%) translateZ(-500px) rotateY(45deg); opacity: 0; z-index: 1; }
-    &.is-hidden-right { transform: translateY(-50%) translateX(120%) translateZ(-500px) rotateY(-45deg); opacity: 0; z-index: 1; }
-    &.is-hidden { display: none; }
+    &.is-active { transform: translateY(-50%) translateX(0); opacity: 1; }
+    &.is-prev { transform: translateY(-50%) translateX(-105%); opacity: 1; }
+    &.is-next { transform: translateY(-50%) translateX(105%); opacity: 1; }
+    &.is-hidden, &.is-hidden-left, &.is-hidden-right { transform: scale(0.8); opacity: 0; }
   }
+
   .nav-button {
-    position: absolute; top: 50%;
-    z-index: 20; background-color: rgba($branco, 0.9); border: none;
-    border-radius: 50%; width: 50px; height: 50px;
-    margin-top: -25px; display: flex; align-items: center; justify-content: center;
-    cursor: pointer; color: $principal; box-shadow: 0 4px 15px rgba($preto, 0.2);
-    transition: all 0.3s ease;
-    svg { width: 30px; height: 30px; fill: currentColor; }
-    &:hover { background-color: $destaque; transform: scale(1.1); }
-    &.prev { left: 10%; }
-    &.next { right: 10%; }
+    width: 48px;
+    height: 48px;
+    margin-top: -24px;
+    &.prev { left: 0.5rem; }
+    &.next { right: 0.5rem; }
   }
+}
 
-  /* --- INÍCIO DAS REGRAS PARA MOBILE --- */
-  @media (max-width: 768px) {
-    .carousel-3d-wrapper {
-      height: 300px; // Altura menor para o carrossel no mobile
-      perspective: none; // Desliga o efeito 3D
-    }
-    
-    .carousel-3d-track {
-      transform-style: flat; // Muda para um contexto 2D
-    }
-
-    .slide-3d {
-      width: 80%; // Slide ativo ocupa mais espaço
-      top: 0; // Reseta o posicionamento vertical
-      transform: translateY(0); // Reseta o posicionamento vertical
-      
-      // Transforma em um carrossel 2D clássico
-      &.is-active {
-        transform: translateX(0);
-        opacity: 1;
-      }
-      &.is-prev {
-        transform: translateX(-110%);
-        opacity: 1;
-      }
-      &.is-next {
-        transform: translateX(110%);
-        opacity: 1;
-      }
-       // Esconde os slides distantes
-      &.is-hidden, &.is-hidden-left, &.is-hidden-right {
-        transform: scale(0.8);
-        opacity: 0;
-      }
-    }
-
-    .nav-button {
-      width: 44px;
-      height: 44px;
-      margin-top: -22px; // Metade da altura
-      // Posiciona os botões mais próximos das bordas
-      &.prev { left: 1rem; }
-      &.next { right: 1rem; }
-    }
-  }
-
-  // Estilos do Lightbox
-  .lightbox-overlay {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background-color: rgba(#131047, 0.9); backdrop-filter: blur(8px);
-    display: flex; align-items: center; justify-content: center;
-    z-index: 1000; padding: 1rem; animation: fadeIn 0.3s ease;
-  }
-  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-  .lightbox-image {
-    max-width: 90vw; max-height: 90vh; object-fit: contain;
-    border-radius: 8px; box-shadow: 0 0 50px rgba(0,0,0,0.5);
-  }
-  .lightbox-close {
-    position: absolute; top: 1.5rem; right: 1.5rem;
-    background: rgba($preto, 0.3); color: $branco; border: none;
-    border-radius: 50%; width: 44px; height: 44px; cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    transition: all 0.3s ease;
-    &:hover { background: $destaque; color: $principal; transform: rotate(90deg); }
-  }
+// Estilos do Lightbox
+.lightbox-overlay {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background-color: rgba(#131047, 0.9); backdrop-filter: blur(8px);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 1000; padding: 1rem; animation: fadeIn 0.3s ease;
+}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.lightbox-image {
+  max-width: 90vw; max-height: 90vh; object-fit: contain;
+  border-radius: 8px; box-shadow: 0 0 50px rgba(0,0,0,0.5);
+}
+.lightbox-close {
+  position: absolute; top: 1.5rem; right: 1.5rem;
+  background: rgba($preto, 0.3); color: $branco; border: none;
+  border-radius: 50%; width: 44px; height: 44px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.3s ease;
+  &:hover { background: $destaque; color: $principal; transform: rotate(90deg); }
+}
 </style>

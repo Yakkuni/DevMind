@@ -37,16 +37,16 @@
       </div>
       <ul class="sidebar-nav">
         <li class="sidebar-item">
-          <router-link to="/" class="sidebar-link" @click="closeSidebarAndNavigate('/')" exact>Início</router-link>
+          <router-link to="/" class="sidebar-link" @click="closeSidebarAndNavigate" exact>Início</router-link>
         </li>
         <li class="sidebar-item">
-          <router-link to="/programacao" class="sidebar-link" @click="closeSidebarAndNavigate('/programacao')">Programação</router-link>
+          <router-link to="/programacao" class="sidebar-link" @click="closeSidebarAndNavigate">Programação</router-link>
         </li>
         <li class="sidebar-item">
-          <router-link to="/patrocinadores" class="sidebar-link" @click="closeSidebarAndNavigate('/patrocinadores')">Patrocinadores</router-link>
+          <router-link to="/patrocinadores" class="sidebar-link" @click="closeSidebarAndNavigate">Patrocinadores</router-link>
         </li>
         <li class="sidebar-item">
-          <router-link to="/sobreNos" class="sidebar-link" @click="closeSidebarAndNavigate('/sobreNos')">Sobre Nós</router-link>
+          <router-link to="/sobreNos" class="sidebar-link" @click="closeSidebarAndNavigate">Sobre Nós</router-link>
         </li>
         <li class="sidebar-item sidebar-cta-item">
           <button class="cta-button sidebar-cta-button" @click="handleParticiparClickSidebar">Participar do Evento</button>
@@ -94,8 +94,6 @@ const closeSidebarAndNavigate = () => {
   }
 };
 
-// A função `closeSidebarAndHandleLink` foi REMOVIDA daqui por não ser mais necessária
-
 const handleParticiparClick = () => {
   window.open("https://www.even3.com.br/devmind-571467/", "_blank");
 };
@@ -134,16 +132,18 @@ $breakpoint-tablet: 850px;
 .navbar {
   position: fixed; top: 0; left: 0; right: 0;
   display: flex; align-items: center; justify-content: space-between;
-  padding: 0.9rem 1.5rem; background-color: transparent;
+  padding: 1.2rem 2rem; 
+  background-color: transparent;
   border-bottom: 1px solid transparent;
-  transition: background-color 0.3s ease, transform 0.3s ease-in-out, box-shadow 0.3s ease;
+  transition: background-color 0.3s ease, transform 0.3s ease-in-out, box-shadow 0.3s ease, padding 0.3s ease;
   z-index: 1000;
 }
 .navbar-scrolled {
   background-color: rgba($principal, 0.95);
-  backdrop-filter: blur(5px);
-  box-shadow: 0 2px 10px rgba($preto, 0.15);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 15px rgba($preto, 0.2);
   border-bottom-color: rgba($branco, 0.1);
+  padding: 0.9rem 2rem; 
 }
 .navbar-hidden {
   transform: translateY(-100%);
@@ -154,11 +154,13 @@ $breakpoint-tablet: 850px;
     &:hover .title { color: $destaque; }
   }
   .logo {
-    height: 50px; width: auto; margin-right: 0.9rem; transition: transform 0.3s ease;
+    height: 65px; 
+    width: auto; margin-right: 1rem; transition: transform 0.3s ease;
     &:hover { transform: rotate(-10deg) scale(1.1); }
   }
   .title {
-    font-size: 2rem; font-weight: 700; color: $branco;
+    font-size: 2.2rem; 
+    font-weight: 700; color: $branco;
     letter-spacing: -0.5px; transition: color 0.3s ease;
   }
 }
@@ -169,16 +171,18 @@ $breakpoint-tablet: 850px;
   }
 }
 .nav-list {
-  display: flex; gap: 2.2rem; list-style: none;
+  display: flex; gap: 2.5rem; 
+  list-style: none;
   margin: 0; padding: 0;
 }
 .nav-link {
-  text-decoration: none; font-weight: 500; font-size: 1rem;
+  text-decoration: none; font-weight: 500; 
+  font-size: 1.1rem; 
   color: $branco; padding: 0.5rem 0.25rem; position: relative;
   transition: color 0.3s ease;
   &::after {
-    content: ''; position: absolute; width: 0; height: 2px;
-    bottom: -2px; left: 50%; transform: translateX(-50%);
+    content: ''; position: absolute; width: 0; height: 3px;
+    bottom: -4px; left: 50%; transform: translateX(-50%);
     background-color: $destaque; transition: width 0.3s ease;
   }
   &:hover { color: $destaque; &::after { width: 100%; }}
@@ -188,23 +192,25 @@ $breakpoint-tablet: 850px;
   }
 }
 .cta-button {
-  padding: 0.6rem 1.25rem; background-color: $destaque;
+  padding: 0.8rem 1.5rem; 
+  background-color: $destaque;
   border: 2px solid $destaque; color: $principal;
-  font-weight: 600; font-size: 0.95rem; border-radius: 25px;
+  font-weight: 700;
+  font-size: 1rem;
+  border-radius: 30px;
   cursor: pointer; transition: all 0.3s ease;
   text-decoration: none; display: inline-block; text-align: center; white-space: nowrap;
   &:hover {
     background-color: darken($destaque, 8%);
     border-color: darken($destaque, 8%);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 10px rgba($destaque, 0.35);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba($destaque, 0.4);
   }
 }
 .event-btn {
-  margin-left: 2.2rem;
+  margin-left: 2.5rem;
 }
 
-/* --- INÍCIO DA CORREÇÃO DO ÍCONE DO MENU --- */
 .menu-toggle-btn {
   display: none;
   background: transparent; border: none; padding: 0.5rem;
@@ -224,36 +230,14 @@ $breakpoint-tablet: 850px;
     transition: transform 0.3s ease-in-out, top 0.3s ease-in-out, bottom 0.3s ease-in-out, background-color 0.3s ease-in-out;
   }
   
-  // Posição inicial das 3 linhas
-  .hamburger-inner {
-    top: 50%;
-    transform: translateY(-50%);
-  }
-  .hamburger-inner::before {
-    top: 0;
-  }
-  .hamburger-inner::after {
-    bottom: 0;
-  }
+  .hamburger-inner { top: 50%; transform: translateY(-50%); }
+  .hamburger-inner::before { top: 0; }
+  .hamburger-inner::after { bottom: 0; }
   
-  // --- NOVA ANIMAÇÃO QUANDO O MENU ESTÁ ATIVO ---
   &.is-active {
-    .hamburger-inner {
-      // A linha do meio se torna invisível
-      background-color: transparent;
-    }
-    .hamburger-inner::before {
-      // A linha de cima desce para o meio e rotaciona 45 graus
-      top: 50%;
-      transform: translateY(-50%) rotate(45deg);
-      background-color: $principal; 
-    }
-    .hamburger-inner::after {
-      // A linha de baixo sobe para o meio e rotaciona -45 graus
-      bottom: 50%;
-      transform: translateY(50%) rotate(-45deg);
-      background-color: $principal;
-    }
+    .hamburger-inner { background-color: transparent; }
+    .hamburger-inner::before { top: 50%; transform: translateY(-50%) rotate(45deg); background-color: $principal; }
+    .hamburger-inner::after { bottom: 50%; transform: translateY(50%) rotate(-45deg); background-color: $principal; }
   }
   
   @media (max-width: $breakpoint-tablet) {
@@ -262,10 +246,9 @@ $breakpoint-tablet: 850px;
     justify-content: center;
   }
 }
-/* --- FIM DA CORREÇÃO --- */
 
 .sidebar {
-  position: fixed; top: 0; right: -100%; width: min(85vw, 320px);
+  position: fixed; top: 0; right: -100%; width: min(85vw, 350px);
   height: 100dvh; background-color: $branco;
   transition: right 0.35s cubic-bezier(0.23, 1, 0.32, 1);
   z-index: 1200; display: flex; flex-direction: column;
@@ -274,32 +257,35 @@ $breakpoint-tablet: 850px;
 }
 .sidebar-header {
   display: flex; justify-content: center; align-items: center;
-  padding: 1.2rem 1.5rem; border-bottom: 1px solid #eaeaea;
-  .sidebar-title { font-size: 1.6rem; font-weight: 700; color: $principal; }
+  padding: 1.5rem;
+  border-bottom: 1px solid #eaeaea;
+  .sidebar-title { font-size: 1.8rem; font-weight: 700; color: $principal; }
 }
 .sidebar-nav {
-  list-style: none; padding: 1rem 1.5rem; margin: 0;
+  list-style: none; padding: 1.5rem; margin: 0;
   flex-grow: 1; overflow-y: auto;
 }
 .sidebar-item {
-  margin-bottom: 0.35rem;
+  margin-bottom: 0.5rem;
   &:last-child { margin-bottom: 0; }
 }
 .sidebar-link {
-  text-decoration: none; font-size: 1.15rem; font-weight: 500;
-  color: #333333; padding: 0.9rem 0.5rem; display: block;
-  border-radius: 4px; transition: background-color 0.2s ease, color 0.2s ease;
+  text-decoration: none; font-size: 1.25rem; font-weight: 500;
+  color: #333333; padding: 1rem 0.8rem; display: block;
+  border-radius: 6px; transition: background-color 0.2s ease, color 0.2s ease;
   &:hover { background-color: lighten($principal, 70%); color: $principal; }
   &.router-link-exact-active {
     background-color: $principal; color: $branco; font-weight: 600;
   }
 }
 .sidebar-cta-item {
-  margin-top: auto; padding: 1.5rem 1.5rem 1rem 1.5rem;
+  margin-top: auto; padding: 2rem 1.5rem;
   border-top: 1px solid #eaeaea; background-color: $branco;
 }
 .sidebar-cta-button {
-  @extend .cta-button; width: 100%; font-size: 1rem;
+  @extend .cta-button; width: 100%; 
+  font-size: 1.1rem;
+  padding: 0.9rem;
 }
 .overlay {
   display: block; position: fixed; top: 0; left: 0; width: 100%;

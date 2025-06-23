@@ -1,10 +1,9 @@
 <template>
   <div class="about-us-page">
-
     <main>
       <section class="hero-section">
         <div class="container">
-          <h1 class="hero-title">Conectando desenvolvedores e ideias inovadoras em um só lugar.</h1>
+          <h1 class="hero-title">Conectando desenvolvedores e ideias inovadoras.</h1>
           <p class="hero-subtitle">Venha se reinventar | O seu futuro é agora!</p>
         </div>
       </section>
@@ -14,15 +13,15 @@
           <div class="intro-text">
             <h2 class="section-title">O Maior Evento de Tecnologia de Tabuleiro do Norte</h2>
             <p>
-              O DevMind nasceu com o propósito de ser o ponto de encontro para a comunidade de tecnologia da nossa região. Somos um evento para profissionais, estudantes e entusiastas apaixonados que buscam atualização, networking de qualidade e oportunidades inovadoras no setor.
+              O DevMind nasceu para ser o ponto de encontro da comunidade de tecnologia da nossa região. Um evento para profissionais, estudantes e entusiastas que buscam atualização, networking e oportunidades inovadoras.
             </p>
-            <p>
-              Aqui, você tem a chance de trocar ideias com grandes nomes do mercado, inspirar novas soluções para seus desafios e se conectar com o que há de mais relevante no universo da tecnologia.
-            </p>
+            <blockquote class="mission-quote">
+              Nossa missão é impulsionar a comunidade, acreditando no poder da colaboração para fortalecer o ecossistema de tecnologia local.
+            </blockquote>
           </div>
           <div class="intro-visual">
             <svg class="decorative-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-              <path fill="#FFA051" d="M38.1,-49.5C52.4,-39.7,69.2,-29.4,75.2,-13.8C81.2,1.8,76.4,22.7,65.3,37.3C54.2,52,36.8,60.4,19.9,65.1C3,69.8,-13.4,70.9,-29.2,65.2C-45,59.5,-60.2,47,-69.1,31.2C-78.1,15.4,-80.7,-3.6,-74.6,-19.5C-68.5,-35.4,-53.7,-48.2,-39.1,-58.1C-24.5,-68,-10.2,-75,4.7,-77.3C19.6,-79.6,39.2,-77.2,49.5,-67.9L38.1,-49.5Z" transform="translate(100 100)" />
+              <path fill="#FFA051" d="M49.5,-67.9C62.7,-60.1,75.9,-46.8,80.1,-31.8C84.3,-16.8,79.5,0,72,14.8C64.5,29.6,54.3,42.4,41.9,52.3C29.6,62.2,14.8,69.2,0.4,68.8C-14,68.4,-28.1,60.6,-41.8,51C-55.5,41.4,-68.8,29.9,-75.3,15.1C-81.8,0.3,-81.4,-17.7,-73.4,-32.9C-65.4,-48.1,-49.8,-60.5,-34.4,-68.8C-19,-77.1,-3.8,-81.3,11.2,-81.7C26.1,-82.1,52.2,-78.3,49.5,-67.9Z" transform="translate(100 100)" />
             </svg>
           </div>
         </div>
@@ -31,23 +30,16 @@
       <section class="features-section">
         <div class="container">
           <h2 class="section-title text-center">Uma Experiência Completa</h2>
-          <p class="section-subtitle text-center">Nossa programação é cuidadosamente planejada para oferecer conhecimento, prática e conexões valiosas.</p>
+          <p class="section-subtitle text-center">Nossa programação é planejada para oferecer conhecimento, prática e conexões valiosas.</p>
           <div class="features-grid">
             <div v-for="feature in features" :key="feature.title" class="feature-card">
               <div class="feature-icon" v-html="feature.icon"></div>
-              <h3 class="feature-title">{{ feature.title }}</h3>
-              <p class="feature-description">{{ feature.description }}</p>
+              <div class="feature-content">
+                <h3 class="feature-title">{{ feature.title }}</h3>
+                <p class="feature-description">{{ feature.description }}</p>
+              </div>
             </div>
           </div>
-        </div>
-      </section>
-
-      <section class="mission-section">
-        <div class="container text-center">
-           <h2 class="section-title">Nossa Missão é Impulsionar a Comunidade</h2>
-           <p class="section-subtitle">
-            Acreditamos no poder da colaboração para fortalecer o ecossistema de tecnologia local. O DevMind é uma plataforma para o crescimento coletivo, viabilizado pelo apoio fundamental de nossos parceiros e pela energia de cada participante.
-           </p>
         </div>
       </section>
 
@@ -55,34 +47,15 @@
         <div class="container text-center">
           <h2 class="section-title">Pronto para o Próximo Nível?</h2>
           <p class="section-subtitle">Garanta sua vaga e faça parte da transformação.</p>
-          <a href="#" class="btn btn-cta large-cta">Participar do Evento</a>
+          <a href="#" class="btn-cta">
+            <span>Participar do Evento</span>
+            <svg class="cta-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+            </svg>
+          </a>
         </div>
       </section>
     </main>
-
-    <footer class="site-footer">
-        <div class="container footer-grid">
-            <div class="footer-col">
-                <h4>DevMind</h4>
-                <p>Conectando desenvolvedores e ideias inovadoras em um só lugar. O maior evento de tecnologia de Tabuleiro do Norte.</p>
-            </div>
-            <div class="footer-col">
-                <h4>Links Rápidos</h4>
-                <ul>
-                    <li><a href="#">Início</a></li>
-                    <li><a href="#">Programação</a></li>
-                    <li><a href="#">Patrocinadores</a></li>
-                </ul>
-            </div>
-            <div class="footer-col">
-                <h4>Contato & Redes</h4>
-                <ul>
-                    <li>Email: contato@devmind.com</li>
-                    <li>Instagram: @devmind.evento</li>
-                </ul>
-            </div>
-        </div>
-    </footer>
   </div>
 </template>
 
@@ -122,11 +95,11 @@ $branco: #ffffff;
 $cinza-fundo: #f8f9fa;
 $texto-escuro: #2d3748;
 $texto-claro: #5a667a;
-$texto-branco-secundario: rgba($branco, 0.85);
 
-// --- Estilos Gerais da Página ---
+// --- Estilos Gerais ---
 .about-us-page {
   background-color: $branco;
+  font-family: 'Inter', sans-serif; // Sugestão de uma fonte moderna
 }
 
 .container {
@@ -138,219 +111,163 @@ $texto-branco-secundario: rgba($branco, 0.85);
 .text-center { text-align: center; }
 
 .section-title {
-  font-size: clamp(2rem, 5vw, 2.5rem);
-  font-weight: 700;
+  font-size: clamp(2rem, 5vw, 2.8rem);
+  font-weight: 800;
   color: $complemento;
   margin-bottom: 1rem;
 }
 
 .section-subtitle {
-  font-size: 1.15rem;
+  font-size: 1.1rem;
   color: $texto-claro;
   max-width: 700px;
   margin: 0 auto 3.5rem auto;
   line-height: 1.7;
 }
 
-// --- Cabeçalho (copiado e adaptado) ---
-.site-header {
-  background-color: $complemento;
-  padding: 1rem 2rem;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-  position: sticky; top: 0; z-index: 1000;
-  .header-container {
-    max-width: 1200px; margin: 0 auto; display: flex;
-    justify-content: space-between; align-items: center;
-  }
-  .logo { color: $branco; font-size: 1.5rem; font-weight: bold; text-decoration: none; }
-  .main-nav ul {
-    list-style: none; display: flex; gap: 2rem; margin: 0; padding: 0;
-    a {
-      color: $texto-branco-secundario; text-decoration: none; font-weight: 500;
-      transition: color 0.2s ease; position: relative; padding-bottom: 0.5rem;
-      &.active, &:hover { color: $branco; }
-      &.active::after {
-        content: ''; position: absolute; bottom: 0; left: 0;
-        width: 100%; height: 2px; background-color: $destaque;
-      }
-    }
-  }
-  .btn-cta {
-    background-color: $destaque; color: $principal; padding: 0.6rem 1.2rem;
-    border-radius: 8px; text-decoration: none; font-weight: bold;
-    transition: background-color 0.2s ease;
-    &:hover { background-color: darken($destaque, 10%); }
-  }
-}
-
 // --- Seção Hero ---
 .hero-section {
-  background: linear-gradient(135deg, $principal, $complemento);
+  background: linear-gradient(145deg, $principal, $complemento);
   color: $branco;
   text-align: center;
-  padding: 6rem 1.5rem;
-
+  padding: 7rem 1.5rem;
   .hero-title {
     color: $branco;
-    font-size: clamp(2.5rem, 6vw, 3.5rem);
-    font-weight: 700;
-    max-width: 800px;
+    font-size: clamp(2.5rem, 6vw, 4rem);
+    font-weight: 800;
+    max-width: 850px;
     margin: 0 auto 1rem auto;
     line-height: 1.2;
   }
   .hero-subtitle {
     color: $destaque;
-    font-size: 1.25rem;
+    font-size: 1.2rem;
     font-weight: 500;
-    letter-spacing: 1px;
   }
 }
 
-// --- Seção de Introdução ---
+// --- Seção de Introdução (com Missão integrada) ---
 .intro-section {
-  padding: 5rem 0;
-  background-color: $branco;
+  padding: 6rem 0;
   .grid-2-cols {
     display: grid;
-    grid-template-columns: 2fr 1fr;
+    grid-template-columns: 1.5fr 1fr;
     align-items: center;
-    gap: 4rem;
+    gap: 5rem;
   }
   .intro-text p {
     font-size: 1.1rem;
     line-height: 1.8;
     color: $texto-claro;
-    margin-bottom: 1.5rem;
+  }
+  .mission-quote {
+    margin-top: 2rem;
+    padding-left: 1.5rem;
+    border-left: 4px solid $destaque;
+    font-size: 1.2rem;
+    font-weight: 500;
+    color: $principal;
+    line-height: 1.6;
   }
   .intro-visual {
     display: flex;
     justify-content: center;
-    align-items: center;
     .decorative-svg path {
-      transform-origin: 100px 100px;
-      animation: morph 8s ease-in-out infinite;
+      animation: morph 12s ease-in-out infinite alternate;
     }
   }
 }
 
-// --- Seção de Features ---
+// --- Seção de Features (Cards Redesenhados) ---
 .features-section {
-  padding: 5rem 0;
+  padding: 6rem 0;
   background-color: $cinza-fundo;
   .features-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
     gap: 2rem;
   }
   .feature-card {
     background-color: $branco;
-    padding: 2.5rem 2rem;
-    text-align: center;
-    border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    padding: 2rem;
+    border-radius: 16px;
+    border: 1px solid #e2e8f0;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     &:hover {
-      transform: translateY(-8px);
-      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      transform: translateY(-10px);
+      box-shadow: 0 20px 40px -15px rgba(45, 55, 72, 0.2);
     }
   }
-  .feature-icon {
-    display: inline-flex;
-    padding: 1rem;
-    background-color: lighten($principal, 75%);
-    border-radius: 50%;
-    margin-bottom: 1.5rem;
-    svg {
-      width: 32px;
-      height: 32px;
-      color: $principal;
-    }
+  .feature-icon svg {
+    width: 40px;
+    height: 40px;
+    color: $destaque;
   }
   .feature-title {
-    font-size: 1.25rem;
-    font-weight: 600;
+    font-size: 1.3rem;
+    font-weight: 700;
     color: $complemento;
-    margin-bottom: 0.75rem;
+    margin: 0;
   }
   .feature-description {
     font-size: 1rem;
     line-height: 1.6;
     color: $texto-claro;
+    margin: 0;
   }
 }
 
-// --- Seção Missão ---
-.mission-section {
-    padding: 6rem 0;
-    background-color: $principal;
-    .section-title {
-        color: $branco;
-    }
-    .section-subtitle {
-        color: $texto-branco-secundario;
-        font-size: 1.2rem;
-    }
-}
-
-// --- Seção CTA Final ---
+// --- Seção CTA Final (Botão Melhorado) ---
 .final-cta-section {
-    padding: 5rem 0;
-    .large-cta {
-        padding: 1rem 2.5rem;
-        font-size: 1.1rem;
-        margin-top: 1rem;
+  padding: 6rem 1.5rem;
+  background-color: $branco;
+  .btn-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: linear-gradient(45deg, $destaque, darken($destaque, 15%));
+    color: $branco;
+    padding: 1rem 2.5rem;
+    border-radius: 50px; // Bordas arredondadas
+    text-decoration: none;
+    font-size: 1.15rem;
+    font-weight: bold;
+    box-shadow: 0 5px 20px -5px rgba($destaque, 0.6);
+    transition: all 0.3s ease;
+    .cta-icon {
+      width: 20px;
+      height: 20px;
+      transition: transform 0.3s ease;
     }
-}
-
-// --- Rodapé ---
-.site-footer {
-    background-color: $complemento;
-    color: $texto-branco-secundario;
-    padding: 4rem 0;
-    font-size: 0.95rem;
-
-    .footer-grid {
-        display: grid;
-        grid-template-columns: 2fr 1fr 1fr;
-        gap: 3rem;
+    &:hover {
+      transform: translateY(-5px) scale(1.05);
+      box-shadow: 0 10px 25px -5px rgba($destaque, 0.5);
+      .cta-icon {
+        transform: translateX(5px);
+      }
     }
-    .footer-col h4 {
-        color: $branco;
-        font-size: 1.1rem;
-        font-weight: 600;
-        margin-bottom: 1rem;
-    }
-    .footer-col p { line-height: 1.7; }
-    .footer-col ul { list-style: none; padding: 0; }
-    .footer-col li { margin-bottom: 0.5rem; }
-    .footer-col a {
-        color: $texto-branco-secundario;
-        text-decoration: none;
-        &:hover { color: $destaque; text-decoration: underline; }
-    }
+  }
 }
 
 // --- Animações e Responsividade ---
 @keyframes morph {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.1) rotate(10deg); }
-  100% { transform: scale(1); }
+  0% { transform: scale(1) rotate(0deg) translate(5px, -10px); }
+  50% { transform: scale(1.1) rotate(5deg) translate(-5px, 10px); }
+  100% { transform: scale(1) rotate(0deg) translate(5px, -10px); }
 }
 
 @media (max-width: 992px) {
   .intro-section .grid-2-cols {
     grid-template-columns: 1fr;
+    gap: 3rem;
     .intro-visual { display: none; }
   }
 }
 
 @media (max-width: 768px) {
-  .site-header {
-    .main-nav { display: none; }
-  }
-  .footer-grid {
-    grid-template-columns: 1fr;
-    text-align: center;
-  }
+  .features-grid { grid-template-columns: 1fr; }
 }
 </style>

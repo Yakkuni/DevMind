@@ -73,24 +73,28 @@ const accordions = [
   {
     title: 'O que é o DevMind?',
     content:
-      'O DevMind é um evento que reúne profissionais, estudantes e entusiastas de tecnologia para promover networking, aprendizado e inovações.'
+      'O DevMind é o principal ponto de encontro da comunidade de tecnologia no Norte. Um evento imersivo com palestras de alto nível, workshops práticos e painéis de discussão que conectam as mentes mais brilhantes do setor para compartilhar conhecimento, criar soluções e definir o futuro da tecnologia na nossa região.'
   },
   {
     title: 'Pra quem é o DevMind?',
     content:
-      'O evento é voltado para estudantes, profissionais e apaixonados por tecnologia que buscam atualização e oportunidades no setor.'
+      'Para todos que respiram tecnologia. Seja você um(a) desenvolvedor(a) experiente em busca de novas stacks, um(a) estudante ansioso(a) pelo primeiro contato com o mercado, um(a) gestor(a) de tecnologia mapeando tendências ou simplesmente um(a) entusiasta apaixonado(a) por inovação, o DevMind é o seu lugar.'
   },
   {
     title: 'Por que ir no DevMind?',
     content:
-      'Participar do DevMind permite trocar ideias, inspirar novas soluções e estar conectado com o que há de mais inovador no setor tecnológico.'
+      'Para acelerar sua carreira e expandir sua visão. No DevMind você terá acesso a: \n • Conhecimento Aplicável: Aprenda com casos reais e ferramentas que você poderá usar no dia seguinte. \n • Networking de Valor: Conecte-se com recrutadores, líderes técnicos e futuros parceiros de negócios. \n • Inspiração e Novas Perspectivas: Volte para casa com a mente fervilhando de novas ideias e a energia renovada para seus projetos.'
+  },
+  {
+    title: 'O que nos torna diferentes?',
+    content:
+      'Nosso foco é a comunidade local. Mais do que um evento, somos um movimento para fortalecer o ecossistema de tecnologia de Tabuleiro do Norte e região. Cada palestra, cada conexão e cada patrocínio são pensados para gerar valor e oportunidades reais aqui, para a nossa gente.'
   }
 ];
 </script>
 
 <style scoped lang="scss">
-// Suas variáveis globais (assumindo que estão disponíveis ou importe-as)
-// Ex: @import '@/styles/variables.scss';
+// Suas variáveis globais
 $principal: #2C2966;
 $complemento: #131047;
 $complementoCLaro: #6C6C94;
@@ -99,21 +103,21 @@ $branco: #ffffff;
 $preto: #000000;
 
 .about-section {
-  position: relative; // Para o overlay
+  position: relative;
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
-  padding: 5rem 1rem; // Aumenta o padding vertical da seção
+  // MUDANÇA: Aumentamos o padding vertical para a seção ocupar mais espaço
+  padding: 7rem 1.5rem; 
   color: $branco;
+  border-bottom: 3px solid $destaque; 
+  border-top: 3px solid $destaque; 
 
   .section-overlay {
     content: '';
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba($complemento, 0.8); // Overlay mais escuro para melhor contraste
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: $complemento; 
     z-index: 1;
   }
 }
@@ -121,14 +125,15 @@ $preto: #000000;
 .about-container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 2rem 1rem; // Padding lateral consistente
+  padding: 2rem 1.5rem;
   position: relative;
   z-index: 2;
 }
 
 .about-columns {
-  display: flex;
-  gap: 1.5rem; // Reduzido de 2rem
+  display: grid; // MUDANÇA: Usando grid para um controle mais preciso
+  grid-template-columns: 1fr 1.2fr; // Dando um pouco mais de espaço para o accordion
+  gap: 4rem; // MUDANÇA: Aumentamos o espaço entre as colunas
   align-items: center;
 }
 
@@ -138,14 +143,15 @@ $preto: #000000;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  padding-right: 1rem; // Pequeno espaçamento se o accordion crescer muito
+  padding-right: 1rem;
 
   h1 {
-    font-size: clamp(2.2rem, 5vw, 3.2rem); // Tamanho de fonte responsivo
-    font-weight: 700;
-    line-height: 1.25;
-    margin-bottom: 2rem; // Mais espaço abaixo do título
-    text-shadow: 0 2px 5px rgba($preto, 0.35);
+    // MUDANÇA: Título principal maior e mais imponente
+    font-size: clamp(2.8rem, 5vw, 4rem); 
+    font-weight: 800; // Mais peso na fonte
+    line-height: 1.2;
+    margin-bottom: 2.5rem; // Mais espaço abaixo
+    text-shadow: 0 3px 10px rgba($preto, 0.4);
 
     span {
       color: $destaque;
@@ -154,23 +160,24 @@ $preto: #000000;
   }
 
   .play-btn {
-    width: 75px;
-    height: 75px;
+    // MUDANÇA: Botão de play um pouco maior
+    width: 85px;
+    height: 85px;
     border-radius: 50%;
     border: 3px solid $destaque;
     background-color: rgba($destaque, 0.15);
     color: $branco;
     cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+    transition: all 0.3s ease;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 0.75rem;
+    margin-bottom: 1rem;
 
     .play-icon {
-      width: 30px;
-      height: 30px;
-      margin-left: 4px; // Ajuste para centralizar visualmente o ícone de play
+      width: 35px; // Ícone maior
+      height: 35px;
+      margin-left: 5px;
     }
 
     &:hover {
@@ -181,7 +188,7 @@ $preto: #000000;
     }
   }
   .play-text {
-    font-size: 0.95rem;
+    font-size: 1rem;
     color: lighten($complementoCLaro, 20%);
     font-weight: 500;
   }
@@ -189,23 +196,23 @@ $preto: #000000;
 
 .about-accordion {
   flex: 1.2;
-  max-width: 620px;
+  max-width: 650px; // Um pouco mais largo
 
   .accordion-item {
-    margin-bottom: 1rem;
+    margin-bottom: 1.2rem; // Mais espaço entre os itens
     border: 1px solid rgba($branco, 0.25);
-    border-radius: 8px;
-    background-color: rgba($principal, 0.4); // Fundo com cor principal e opacidade
+    border-radius: 12px; // Bordas mais arredondadas
+    background-color: rgba($principal, 0.4);
     overflow: hidden;
-    transition: background-color 0.3s ease, border-color 0.3s ease;
+    transition: all 0.3s ease;
 
     &:hover, &.is-active {
       border-color: rgba($destaque, 0.8);
       background-color: rgba($principal, 0.6);
     }
     
-    &.is-active { // Estilo adicional para quando o item está ativo
-        border-left: 4px solid $destaque; // Borda lateral de destaque
+    &.is-active {
+        border-left: 4px solid $destaque;
     }
 
     .accordion-trigger {
@@ -214,12 +221,13 @@ $preto: #000000;
       background: transparent;
       border: none;
       color: $branco;
-      padding: 1.2rem 1.5rem;
+      // MUDANÇA: Mais padding para um toque maior
+      padding: 1.5rem 1.8rem; 
       cursor: pointer;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 1.1rem;
+      font-size: 1.2rem; // Fonte maior
       font-weight: 600;
       transition: color 0.3s ease;
 
@@ -227,26 +235,19 @@ $preto: #000000;
         color: $destaque;
       }
 
-      .icon {
-        transition: transform 0.3s ease;
-        display: flex;
-        align-items: center;
-        .accordion-icon {
-            width: 20px;
-            height: 20px;
-        }
+      .icon .accordion-icon {
+        width: 22px; // Ícone + e - maiores
+        height: 22px;
       }
-      // Opcional: Animar o ícone se for um único ícone que rotaciona
-      // &[aria-expanded="true"] .icon {
-      //   transform: rotate(45deg);
-      // }
     }
 
     .accordion-content {
-      padding: 0 1.5rem 1.2rem 1.5rem; // Ajustado para não ter padding-top, pois o trigger já tem bottom padding visual
-      font-size: 0.95rem;
-      line-height: 1.65;
-      color: lighten($complementoCLaro, 30%); // Cor de texto mais clara e suave
+      // MUDANÇA: Mais padding e texto maior
+      padding: 0 1.8rem 1.5rem 1.8rem; 
+      font-size: 1rem;
+      line-height: 1.7;
+      color: lighten($complementoCLaro, 30%);
+      white-space: pre-line; // Interpreta as quebras de linha (\n) do texto
 
       p {
         margin: 0;
@@ -255,64 +256,34 @@ $preto: #000000;
   }
 }
 
-.accordion-enter-active,
-.accordion-leave-active {
-  transition: max-height 0.35s ease-in-out, opacity 0.3s ease-in-out, padding-top 0.35s ease-in-out, padding-bottom 0.35s ease-in-out;
-  overflow: hidden;
-}
-.accordion-enter-from,
-.accordion-leave-to {
-  opacity: 0;
-  max-height: 0;
-  padding-top: 0 !important; // Força o padding a 0 durante a animação de fechamento
-  padding-bottom: 0 !important;
-}
-.accordion-enter-to,
-.accordion-leave-from {
-  opacity: 1;
-  max-height: 500px; // Ajuste para a altura máxima esperada do conteúdo
-  // O padding é restaurado pelo estilo normal da classe .accordion-content
-}
+// Animação do Accordion (sem alterações)
+.accordion-enter-active, .accordion-leave-active { transition: max-height 0.4s ease-in-out, opacity 0.3s ease-in-out; overflow: hidden; }
+.accordion-enter-from, .accordion-leave-to { opacity: 0; max-height: 0; }
+.accordion-enter-to, .accordion-leave-from { opacity: 1; max-height: 500px; }
+
 
 // Responsividade
-@media (max-width: 820px) { // Ajustado breakpoint para tablet
+@media (max-width: 900px) { // Ajustado breakpoint
   .about-columns {
-    flex-direction: column;
-    gap: 3rem; // Espaço entre header e accordion empilhados
-    align-items: center; // Centraliza os itens empilhados
+    grid-template-columns: 1fr; // Coluna única
+    gap: 3rem;
   }
   .about-header {
-    padding-right: 0; // Remove padding quando empilhado
-    margin-bottom: 1rem; // Espaço abaixo do header antes do accordion
+    padding-right: 0;
+    margin-bottom: 1rem;
     h1 {
-      font-size: clamp(2rem, 6vw, 2.8rem);
+      font-size: clamp(2.4rem, 8vw, 3rem);
     }
   }
   .about-accordion {
     width: 100%;
-    max-width: 600px; // Mantém uma largura máxima agradável mesmo em mobile
+    max-width: 650px;
   }
 }
 
 @media (max-width: 480px) {
   .about-section {
-    padding: 3rem 0.5rem; // Menos padding lateral em telas muito pequenas
-  }
-  .about-container {
-    padding: 1rem 0.5rem;
-  }
-  .about-header h1 {
-    font-size: clamp(1.8rem, 7vw, 2.2rem);
-  }
-  .about-accordion .accordion-item {
-    .accordion-trigger {
-      font-size: 1rem;
-      padding: 1rem;
-    }
-    .accordion-content {
-      font-size: 0.9rem;
-      padding: 0 1rem 1rem 1rem;
-    }
+    padding: 5rem 1rem;
   }
 }
 </style>

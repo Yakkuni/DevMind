@@ -29,6 +29,7 @@
               <img :src="getFullImageUrl(sp.foto)" :alt="`Foto de ${sp.nome}`" class="photo" />
             </div>
             <div class="name">{{ sp.nome }}</div>
+            <div v-if="sp.cargo" class="role">{{ sp.cargo }}</div>
             <div class="description">{{ sp.descricao }}</div>
             <div class="social-links" v-if="hasSocialLinks(sp.redes)">
               <a v-if="sp.redes.instagram" :href="sp.redes.instagram" target="_blank" rel="noopener noreferrer" :aria-label="`Instagram de ${sp.nome}`" title="Instagram">
@@ -75,19 +76,19 @@ interface Speaker {
   foto: string;
   redes: SocialLinks;
   tag?: string;
+  cargo?: string; // Campo 'cargo' adicionado
 }
 
-// --- ALTERAÇÃO 2: Função auxiliar para montar a URL completa ---
 /**
  * Constrói a URL completa para uma imagem a partir da variável de ambiente.
  * @param relativeUrl A URL vinda da API (ex: /uploads/foto.png)
  */
 function getFullImageUrl(relativeUrl: string | undefined): string {
   if (!relativeUrl || relativeUrl.startsWith('http')) {
-    return relativeUrl || ''; // Retorna string vazia se for undefined para evitar erro no 'src'
+    return relativeUrl || '';
   }
   const baseUrl = import.meta.env.VITE_API_BASE_URL;
-  return `<span class="math-inline">\{baseUrl\}</span>{relativeUrl}`;
+  return `${baseUrl}${relativeUrl}`;
 }
 
 
@@ -109,17 +110,15 @@ const hasSocialLinks = (redes: SocialLinks) => {
     return Object.values(redes).some(link => link && link.trim() !== '');
 };
 
-// --- ALTERAÇÃO 3: Usando a variável de ambiente na busca de dados ---
 async function fetchSpeakers() {
   console.log('Disparando fetchSpeakers...');
   try {
-    // Monta a URL completa da API dinamicamente
     const apiUrl = `${import.meta.env.VITE_API_BASE_URL}/palestrante`;
     const res = await axios.get<Speaker[]>(apiUrl);
 
     speakers.value = Array.isArray(res.data) ? res.data : [];
     if (!Array.isArray(res.data)) {
-         console.warn('Formato inesperado da resposta da API de palestrantes:', res.data);
+        console.warn('Formato inesperado da resposta da API de palestrantes:', res.data);
     }
     if (speakers.value.length > 0) {
       resetCarouselVisualState();
@@ -130,7 +129,7 @@ async function fetchSpeakers() {
   } 
 }
 
-// O restante da lógica do carrossel permanece a mesma
+// O restante da lógica do carrossel
 function startAuto() {
   clearInterval(interval.value);
   if (speakers.value.length > (isMobile.value ? 1 : slidesVisiveisDesktop)) {
@@ -217,17 +216,17 @@ $preto: #000000;
 $cinza-borda-suave: #e0e0e0;
 
 .speakers-carousel-section {
-  padding: 4rem 1rem;
+  padding: 6rem 1rem;
   text-align: center; 
 }
 .section-title {
   display: inline-block; 
   position: relative;
-  font-size: clamp(2.2rem, 5vw, 3rem); 
+  font-size: clamp(2.5rem, 5vw, 3.2rem);
   color: $branco; 
-  font-weight: 700;
-  margin-bottom: 3rem; 
-  padding-bottom: 0.8rem; 
+  font-weight: 800;
+  margin-bottom: 4rem;
+  padding-bottom: 1rem;
   letter-spacing: -0.5px;
   text-shadow: 0 2px 4px rgba($preto, 0.25); 
 
@@ -237,19 +236,19 @@ $cinza-borda-suave: #e0e0e0;
     bottom: 0;
     left: 50%;
     transform: translateX(-50%); 
-    width: 90px; 
-    height: 4px;  
+    width: 100px; 
+    height: 5px; 
     background-color: $destaque; 
-    border-radius: 2px;
+    border-radius: 3px;
   }
 }
 .carousel-container {
   position: relative;
   overflow: hidden;
-  max-width: 1200px;
-  width: 90%; 
+  max-width: 1300px;
+  width: 95%; 
   margin: 0 auto;
-  padding-top: 20px;     
+  padding-top: 20px;
   padding-bottom: 20px; 
 }
 .carousel-track {
@@ -257,7 +256,7 @@ $cinza-borda-suave: #e0e0e0;
 }
 .carousel-item {
   flex: 0 0 100%;
-  padding: 0 0.75rem; 
+  padding: 0 1.25rem;
   box-sizing: border-box;
   display: flex;
   justify-content: center;
@@ -266,27 +265,24 @@ $cinza-borda-suave: #e0e0e0;
   @media (min-width: 769px) {
     flex: 0 0 calc(100% / 3);
   }
-  @media (min-width: 1024px) {
-      padding: 0 1rem;
-  }
 }
 .speaker-card {
   background: $branco;
-  border-radius: 16px;
-  padding: 1.8rem 1.5rem;
+  border-radius: 20px;
+  padding: 2.5rem 2rem;
   text-align: center;
-  box-shadow: 0 8px 25px rgba($complemento, 0.08), 0 4px 10px rgba($complemento, 0.05);
+  box-shadow: 0 10px 30px rgba($complemento, 0.08), 0 5px 15px rgba($complemento, 0.05);
   transition: transform 0.3s ease-out, box-shadow 0.3s ease-out;
   display: flex;
   flex-direction: column;
   width: 100%;
-  max-width: 340px;
+  max-width: 360px;
   margin: 0 auto;
   border: 1px solid $cinza-borda-suave;
 
   &:hover {
-    transform: translateY(-8px); 
-    box-shadow: 0 12px 35px rgba($complemento, 0.12), 0 6px 15px rgba($complemento, 0.08);
+    transform: translateY(-12px); 
+    box-shadow: 0 15px 40px rgba($complemento, 0.12), 0 8px 20px rgba($complemento, 0.08);
   }
   .label {
     display: inline-block;
@@ -298,16 +294,16 @@ $cinza-borda-suave: #e0e0e0;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.8px;
-    margin: 0 auto 1.25rem auto;
+    margin: 0 auto 1.5rem auto;
     line-height: 1;
   }
   .photo-wrapper {
-    margin: 0 auto 1.25rem auto;
-    width: 140px;
-    height: 140px;
+    margin: 0 auto 1.5rem auto;
+    width: 180px;
+    height: 180px;
     border-radius: 50%;
     overflow: hidden;
-    box-shadow: 0 0 0 6px $branco, 0 0 0 8px $destaque;
+    box-shadow: 0 0 0 8px $branco, 0 0 0 10px $destaque;
   }
   .photo {
     width: 100%;
@@ -315,19 +311,26 @@ $cinza-borda-suave: #e0e0e0;
     object-fit: cover;
   }
   .name {
-    font-size: 1.3rem;
+    font-size: 1.5rem;
     font-weight: 700;
     color: $principal;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.25rem;
     line-height: 1.3;
   }
-  .description {
+  .role {
     font-size: 0.9rem;
-    color: $complementoCLaro;
-    line-height: 1.55;
-    flex-grow: 1;
-    margin-top: 0.25rem;
+    font-weight: 500;
+    color: $destaque;
     margin-bottom: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .description {
+    font-size: 0.95rem;
+    color: $complementoCLaro;
+    line-height: 1.6;
+    flex-grow: 1;
+    margin-bottom: 1.5rem;
     max-height: 120px;
     overflow-y: auto;
     &::-webkit-scrollbar { width: 6px; }
@@ -336,10 +339,10 @@ $cinza-borda-suave: #e0e0e0;
   }
   .social-links {
     margin-top: auto;
-    padding-top: 0.75rem;
+    padding-top: 1rem;
     display: flex;
     justify-content: center;
-    gap: 1rem;
+    gap: 1.25rem;
     a {
       color: $complementoCLaro;
       transition: color 0.3s ease, transform 0.2s ease;
@@ -349,8 +352,8 @@ $cinza-borda-suave: #e0e0e0;
         transform: translateY(-2px);
       }
       svg {
-        width: 22px;
-        height: 22px;
+        width: 24px;
+        height: 24px;
         fill: currentColor;
       }
     }
